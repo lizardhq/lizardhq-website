@@ -1,7 +1,7 @@
 # Site settings
 title: LizardHQ research
 description:
-baseurl: "" # the subpath of your site, e.g. /blog/
+baseurl: "/lizardhq-website" # the subpath of your site, e.g. /blog/
 
 # Build settings
 markdown: redcarpet
