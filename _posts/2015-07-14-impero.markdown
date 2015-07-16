@@ -1,0 +1,52 @@
+---
+layout: post
+title: "Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro"
+date: 2015-07-14
+categories:
+---
+
+*By slipstream/RoL.*
+
+# Overview
+
+[Impero Education Pro](https://www.imperosoftware.co.uk/) is "a single, feature rich solution combining network management, desktop management and classroom management software for education".
+
+Issues in Impero Education Pro, version 5.0.03 and below, can be exploited to cause remote command execution on every client.
+
+# Issues
+
+The software consists of a client that communicates with a server, to enable the server to manage and monitor the client machine. There exists issues in the communication and authentication method between the client and server, which can be easily leveraged to allow for remote code execution on every client machine managed by the server. This is due to a fatal design flaw in the software: the server grants all clients the privilege to execute any file on any other client's machine.
+
+## Privilege Escalation
+
+All clients are able to send client commands to other clients via the `ECHO` command, which can be used to execute system commands.
+
+### Server-side commands
+* The `SENDALLCLIENTS` command causes the server to send the client a list of all connected clients. This list may be gzip compressed and base64 encoded.
+* The `ECHO` command sends the command given as the argument across to all specified clients, enabling us access to commands only implemented on the client side.
+
+### Client-side commands
+
+* The `OPENFILE` command takes as arguments a file to run, and the username and password to run it as. For Windows clients, the username can be `NT AUTHORITY\SYSTEM`, and if that is the case, the password given can be anything.
+
+* The `SENDCOMMANDMSG` command takes one argument: a system command that gets passed to `system()` and ran as the user that the Impero service is running as; this, of course, will be SYSTEM on Windows.
+
+Note that some protocol commands get logged server-side. This includes `SENDCOMMANDMSG` but not `OPENFILE`.
+
+## Hard-coded Encryption Key
+
+The protocol is encrypted on the wire with AES-128-CBC, and ISO10126 padding. The key and IV are static and derived from a SHA512 hash of the string `Imp3ro`.
+
+## Hard-coded Authentication Password
+
+When connected, a client must authenticate. This is done by sending the string `-1|AUTHENTICATE\x02PASSWORD`, encrypted as outlined in the above section (*Hard-coded Encryption Key*). `PASSWORD` is a string that is hard-coded - that is the actual password.
+
+After authentication, an attacker has full reign to send whatever supported protocol commands they wish.
+
+# Affected Versions
+
+5.0.03 and below.
+
+# Solution
+
+Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
