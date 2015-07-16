@@ -9,6 +9,12 @@
 
     .site-header a {color: $brand-color};
 
+    .logo img {
+      height: 55px;
+      float: left;
+      margin-left: 25px;
+    }
+
     .site-nav {
         padding-top: 16px;
         float: right;
