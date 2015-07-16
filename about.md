@@ -7,7 +7,7 @@ LizardHQ is an information security think tank and group of friends founded in S
 
 Contributors to LizardHQ research include (in no particular order):
 
-* [slipsteam/RoL](https://twitter.com/TheWack0lian)
+* [slipstream/RoL](https://twitter.com/TheWack0lian)
 * [Mustafa Al-Bassam](https://musalbas.com)
 * [Donncha O'Cearbhaill](http://donncha.is/)
 * [joepie91 (Sven Slootweg)](http://cryto.net/~joepie91/)
