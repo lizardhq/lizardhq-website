@@ -5,8 +5,6 @@ date: 2015-07-14
 categories:
 ---
 
-*By slipstream/RoL.*
-
 # Overview
 
 [Impero Education Pro](https://www.imperosoftware.co.uk/) is "a single, feature rich solution combining network management, desktop management and classroom management software for education".
