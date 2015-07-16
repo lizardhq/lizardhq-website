@@ -17,6 +17,8 @@ Issues in Impero Education Pro, version 5.0.03 and below, can be exploited to ca
 
 The software consists of a client that communicates with a server, to enable the server to manage and monitor the client machine. There exists issues in the communication and authentication method between the client and server, which can be easily leveraged to allow for remote code execution on every client machine managed by the server. This is due to a fatal design flaw in the software: the server grants all clients the privilege to execute system commands on any other client's machine.
 
+A [remote code execution proof-of-concept that exploits these issues and pops `calc.exe` on all connected clients in available](https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc.php).
+
 ## Privilege Escalation
 
 All clients are able to send client commands to other clients via the `ECHO` command, which can be used to execute system commands.
