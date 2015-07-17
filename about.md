@@ -3,7 +3,7 @@ layout: page
 title: About
 permalink: /about/
 ---
-LizardHQ is an information security think tank and group of friends founded in September 2013 by some ex-LulzSec hackers. We release security advisories and research, and we particularly enjoy exploiting and repurposing corporate and state surveillance tools.
+LizardHQ is a community of security researchers and activists, and information security think tank founded in September 2013 by some ex-LulzSec hackers. We release security advisories and research, and we particularly enjoy studying, exploiting and repurposing corporate and state surveillance technology.
 
 Contributors to LizardHQ research include (in no particular order):
 
