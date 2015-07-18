@@ -1,2 +1,0 @@
-# lizardhq-website
-test
