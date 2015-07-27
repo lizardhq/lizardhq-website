@@ -15,4 +15,4 @@ Contributors to LizardHQ research include (in no particular order):
 * [Ryan Ackroyd](https://twitter.com/APT1337)
 * spoonzy
 * [Sebastiaan Provost](https://twitter.com/Stekkz)
-* [Touys Akira](https://twitter.com/ClipperChip)
+* [Touya Akira](https://twitter.com/ClipperChip)
