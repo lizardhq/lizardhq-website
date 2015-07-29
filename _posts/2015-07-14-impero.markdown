@@ -17,13 +17,13 @@ The software consists of a client that communicates with a server, to enable the
 
 A [remote code execution proof-of-concept that exploits these issues and pops `calc.exe` on all connected clients in available](https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc.php).
 
-## Privilege Escalation
+## Privilege Escalation (leading to Remote Code Execution)
 
 All clients are able to send client commands to other clients via the `ECHO` command, which can be used to execute system commands.
 
 ### Server-side commands
 * The `SENDALLCLIENTS` command causes the server to send the client a list of all connected clients. This list may be gzip compressed and base64 encoded.
-* The `ECHO` command sends the command given as the argument across to all specified clients, enabling us access to commands only implemented on the client side.
+* The `ECHO` command sends the command given as the argument across to all specified clients, enabling access to commands only implemented on the client side.
 
 ### Client-side commands
 
