@@ -36,13 +36,12 @@ PoC:
 curl -i --data "action=getblackcard&game=1 union select 1,2,3,@@version-- -" "http://casbeta.herokuapp.com/process.php"
 {% endhighlight %}
 
-This SQL injection was used to dump all of the white and black cards from Cards against Security's database.
-
 # Video of Persistent XSS
 <iframe width="560" height="315" src="https://www.youtube.com/embed/yhBqfaHTLPE" frameborder="0" allowfullscreen></iframe>
 
 # Conclusion
-Had we been a malicious bunch, we could have easily, instead of redirecting to a rickroll, injected an iFrame that did things like, say, redirect users silently to browser exploits, and conducted an unauthorized penetration test of the userbase of this application. Given the users were all infosec people, this was potentially an excellent watering-hole attack vector specifically for targetting the security industry. While Fortinet have implied that the vulnerabilities were deliberate, this is a wholly irresponsible approach for a vendor to take as it implies that they don't care that they put a bunch of their industry peers at risk. Our advice to people is quite simple: Don't blindly go clicking on, and trusting, random webapps that crop up for novelty purposes. Furthermore, we intend on releasing a not-vulnerable version of the game with an expanded card-deck shortly for you all to enjoy :)
+Had we been a malicious bunch, we could have easily injected an iFrame that did things like, say, redirect users silently to browser exploits, and conducted an unauthorized penetration test of the userbase of this application (which of you have REALLY patched/removed Flash then?).  
+Given the users were all infosec people, this was potentially an excellent watering-hole attack vector specifically for targetting the security industry. While Fortinet have implied that the vulnerabilities were deliberate, this is a wholly irresponsible approach for a vendor to take as it implies that they don't care that they put a bunch of their industry peers at risk. Our advice to people is quite simple: Don't blindly go clicking on, and trusting, random webapps that crop up for novelty purposes. Furthermore, we intend on releasing a not-vulnerable version of the game with an expanded card-deck shortly for you all to enjoy :)
 
 As a final note, [Fortinet have some SSL issues to sort out][fortissl] <3
 
