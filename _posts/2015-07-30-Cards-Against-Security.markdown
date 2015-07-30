@@ -8,7 +8,7 @@ categories:
 *By slipstream/RoL, IceMans- and David Davidson.*
 
 # Overview
-Earlier in this week, [Fortinet][fortinet] launched the [Cards Against Security][cardsagainstsecurity] online game, a [Cards Against Humanity][cardsagainsthumanity] clone with an Infosec twist. This kind of thing usually tends to happen around the "conference season". As it happened, this application suffered a number of rather severe security vulnerabilities which we were able to exploit for great justice. The application was taken offline following exploitation.
+Earlier in this week, [Fortinet][fortinet] launched the [Cards Against Security][cardsagainstsecurity] online game, a [Cards Against Humanity][cardsagainsthumanity] clone with an Infosec twist. This kind of thing usually tends to happen around the "conference season". As it happened, this application suffered a number of rather severe security vulnerabilities which were exploited for great justice. The application was taken offline following exploitation.
 
 # Issues
 
