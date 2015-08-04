@@ -1,0 +1,62 @@
+---
+layout: post
+title: "Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro (II)"
+date: 2015-08-04
+categories:
+---
+
+# Overview
+
+[Impero Education Pro](https://www.imperosoftware.co.uk/) is "a single, feature rich solution combining network management, desktop management and classroom management software for education".
+
+Issues in Impero Education Pro, version 5.0.03 to 5.1.04, can be exploited to cause remote command execution on every client.
+
+# Disclosure note
+
+The vendor was not amused at our [last security advisory](../../../2015/07/14/impero.html) because full disclosure was opted for instead of co-ordinated disclosure. They responded with a [cease-and-desist letter](../../../files/Letter to Mr Zammis A Clark dated 13 July 2015.pdf) from their lawyers.
+
+This time, we decided to inform them of the new vulnerabilities outlined in this advisory before public release.
+
+So we arranged for 9001 copies of the advisory and proof-of-concept to be [delivered to their office in person](http://iops.io/blog/impero-software-over-9000). They were not amused either. There is just no winning, is there? See below for a video of the delivery.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/OCh867rT1dg?start=90" frameborder="0" allowfullscreen></iframe>
+
+# Issues
+
+The week after the [vulnerabilities in version 5.0.03 and below](../../../2015/07/14/impero.html) were disclosed, the vendor released a hotfix to work around the issue. The hotfix adds additional authentication that is needed to access the `ECHO` command; a static security-by-obscurity challenge-response system that is only a little less trivial to implement.
+
+A client with this new authentication algorithm implemented can connect to a server that implements it and continue to exploit the previously discovered vulnerabilities.
+
+## Privilege Escalation (leading to Remote Code Execution)
+
+Due to a static security-by-obscurity weak authentication algorithm, all clients are able to send client commands to other clients via the `ECHO` command, which can only be accessed after performing the authentication algorithm. This can be used to execute system commands.
+
+The authentication algorithm does not require the client to know any secrets or passphrases - only knowledge of the algorithm itself is needed to authenticate.
+
+A [remote code execution proof-of-concept that exploits these issues and pops `calc.exe` on all connected clients is available](https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc-2.php).
+
+### Authentication algorithm
+
+The static authentication algorithm is as follows.
+
+1. Create a SHA512 hash of some random data, encode it as hexits, and send to the server `AUTHENTICATE_L1`, with the argument being the hash.
+2. The server should send back a `CHALLENGE_L1` command, with one argument which is a hexit-encoded SHA512 hash of random data that it created. (Side note: in the server implementation, a non-cryptographically secure PRNG is used.)
+3. Concatenate together the hash that the server sent back, the string `{edbe23f3-eeda-49ef-9155-9bab8f584c55},{b40121e9-bb21-47c2-9ff7-4cbb09ec06a8}753f`, and the hash that we sent to the server, and make a SHA512 hash of this string. We call this hash `hash one`.
+4. Apply 1000 rounds of SHA512 on `hash one`, to create `hash two`. Store the hash in both raw binary data and as hexits.
+5. Brute force a SHA512 hash based on the raw binary data of `hash two`. This should be done by finding an integer `i` (iterating from 0), encoding it in hexadecimal form, concatenating it to the raw binary data of `hash two`, hashing it (`SHA512(hashtwo.hex(i))`) and comparing the first two bytes of the resulting hash and `hash one`. If they are equal, the resulting hash becomes `hash three`, which should be stored as raw binary data. *Yes, bruteforcing is actually a part of the authentication algorithm - presumably as some kind of proof-of-work.*
+6. Brute force another SHA512 hash based on the raw binary data of `hash two`. This is done the same as previously in step 5, except `hash two` should be contatenated to the hexadecimal encoded integer (`SHA512(hex(i).hashtwo)`), and the last two bytes should be compared; if they are equal, the generated hash becomes `hash four`, which should be stored as raw binary data.
+Concatenate `hash three` and `hash four` together, and create a SHA512 hash of the resulting byte array, to create `hash five`, which should be stored as hexits.
+7. Take the first 0x10 bytes from the `hash five` hexit string, and from now on use it as the protocol communication AES key. Similarly, take the last 0x10 bytes from the hexit string, and use it as the new initialisation vector.
+8. Using the new key/IV, send to the server `RESPONSE_L1`, with the argument being the hexit encoded `hash two`.
+9. The server should send a `SERVER_AUTH_L1` command with the argument `OK`.
+10. Send the server a `CLIENT_AUTH_L1` command with no argument.
+The server does not respond to this command; after the command is sent, the client is fully authenticated.
+
+
+# Affected Versions
+
+5.0.08+ and 5.1.02+.
+
+# Solution
+
+Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
