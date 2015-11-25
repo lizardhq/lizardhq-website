@@ -16,3 +16,4 @@ Contributors to LizardHQ research include (in no particular order):
 * spoonzy
 * [Sebastiaan Provost](https://twitter.com/Stekkz)
 * [Touya Akira](https://twitter.com/ClipperChip)
+* [slipstream/RoL](https://twitter.com/TheWack0lian)
