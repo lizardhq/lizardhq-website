@@ -51,4 +51,4 @@ echo json_encode( (object) array(
 
 # Solution
 
-Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
+Uninstallation of Dell Foundation Services will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
