@@ -9,9 +9,9 @@ categories:
 
 # Overview
 
-Dell Foundation Services (otherwise known by its internal name of "Tribbles") "provides a core set of foundational services facilitating customer serviceability, messaging and support functions."
+Dell Foundation Services (otherwise known by its internal name of "Tribbles") "provides a core set of foundational services facilitating customer serviceability, messaging and support functions".
 
-# Issue
+# Issues
 
 Dell Foundation Services starts an HTTPd that listens on port 7779. The previous service tag leak was fixed by removing the JSONP API.
 
@@ -50,7 +50,7 @@ wmic('','');
 
 # Affected Versions
 
-3.0.700.0 
+3.0.700.0.
 
 # Solution
 
