@@ -17,7 +17,9 @@ Dell Foundation Services starts an HTTPd that listens on port 7779. The previous
 
 However, the webservice in question is still available; it is now a SOAP service, and all methods of that webservice can be accessed, not just the ServiceTag method.
 
-One of the methods accessible is `List<WmiManagementItem> GetWmiCollection(string wmiQuery)` - this returns the results of a given WMI (Windows Management Instrumentation, "the infrastructure for management data and operations on Windows-based operating systems") query, enabling access of hardware information, installed software, running processes, installed services, accessible hard disks, filesystem metadata (filenames, file size, dates) and more.
+One of the methods accessible is `List<WmiManagementItem> GetWmiCollection(string wmiQuery)` - this returns the results of a given Windows Management Instrumentation (WMI) query, enabling access to information about hardware, installed software, running processes, installed services, accessible hard disks, filesystem metadata (filenames, file size, dates) and more.
+
+[WMI](https://msdn.microsoft.com/en-us/library/windows/desktop/aa394582(v=vs.85).aspx) is "the infrastructure for management data and operations on Windows-based operating systems".
 
 [Many potentially vulnerable hosts can be found via Shodan](https://www.shodan.io/search?query=port%3A7779+httpapi+404&language=None) and the issue can also be exploited over a LAN.
 
