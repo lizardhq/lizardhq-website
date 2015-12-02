@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Security Advisory: Dell Foundation Services Remote Information Disclosure (II)"
-date: 2015-11-25
+date: 2015-12-01
 categories:
 ---
 
