@@ -7,6 +7,7 @@ LizardHQ is a community of security researchers and activists, and information s
 
 Contributors to LizardHQ research include (in no particular order):
 
+* [slipstream/RoL](https://twitter.com/TheWack0lian)
 * [Darren Martyn](http://0x27.me/about/)
 * [Mustafa Al-Bassam](https://musalbas.com)
 * [Donncha O'Cearbhaill](http://donncha.is/)
@@ -16,3 +17,4 @@ Contributors to LizardHQ research include (in no particular order):
 * spoonzy
 * [Sebastiaan Provost](https://twitter.com/Stekkz)
 * [Touya Akira](https://twitter.com/ClipperChip)
+
