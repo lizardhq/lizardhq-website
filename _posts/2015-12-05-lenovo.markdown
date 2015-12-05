@@ -1,0 +1,40 @@
+---
+layout: post
+title: "Security Advisory: Lenovo Solution Center Local Privilege Escalation"
+date: 2015-12-05
+categories:
+---
+
+*By slipstream/RoL.*
+
+# Overview
+
+Lenovo Solution Center "allows users to quickly identify the status for system health, network connections and overall system security."
+
+Issues in Lenovo Solution Center, versions 3.1.004 and below, can be exploited to gain local privilege escalation to SYSTEM, and remote code execution as SYSTEM while Lenovo Solution Center is open.
+
+# Issues
+
+Lenovo Solution Center installs a service, `LSCWinService`, which Everyone has permissions to start, and runs as SYSTEM.
+
+The service must be started using `sc.exe` and passed specific arguments; when it is passed the argument `StartBackend` it runs `LSCTaskService.exe` as SYSTEM.
+
+`LSCTaskService` starts an HTTP API on localhost, port 55555, and GET or POST requests can be passed to it to execute methods out of specific classes in `LSCController.dll`.
+
+The `Actions` class, which is allowed to be called from the HTTP API, has a `RunInstaller` method, which runs the provided executable argument from `%APPDATA%\LSC\Local Store` as SYSTEM, where `%APPDATA%` here is `C:\ProgramData` on Windows Vista and above.
+
+Any locally running code can copy an executable to this folder and use the HTTP API to run it as SYSTEM.
+
+Additionally, the `RunInstaller` method has a path traversal vulnerability, so any executable on `%SYSTEMDRIVE%` can be run as SYSTEM.
+
+There is no API token or referer check on the HTTP API, so cross site request forgery can be used to remotely execute any executable on `%SYSTEMDRIVE%` as SYSTEM, if Lenovo Solution Center is running.
+
+A PoC is available as `lenovoSYSTEMcenter.d` (and on the page itself, there's a link to exploit the CSRF) in [this trio of OEM exploit PoCs.](http://rol.im/oemdrop/)
+
+# Affected Versions
+
+3.1.004 and below.
+
+# Solution
+
+Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
