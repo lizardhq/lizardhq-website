@@ -1,0 +1,32 @@
+---
+layout: post
+title: "Security Advisory: Multiple Critical Vulnerabilities in PCPitstop PC Matic"
+date: 2016-02-19
+categories:
+---
+
+*By slipstream/RoL.*
+
+# Overview
+
+PC Matic "provides superior security protection over all security products, free or otherwise, on the market.".
+
+An issue in PC Matic, versions 1.1.0.65 and below, can be exploited by an entity in a man-in-the-middle position to cause remote code execution, as SYSTEM or as a standard user.
+
+Issues in PC Matic, versions 1.1.0.65 and below, can be exploited by a web page to potentially cause remote code execution as a standard user.
+
+# Issues
+
+The PC Matic application is basically IE. A version of IE that allows for certain objects like `WScript.Shell` to be instantiated. The application loads a home page via HTTP, which then loads some javascript files, which among other things do call out to `WScript.Shell`. An entity in a MITM position can easily intercept requests to `http://*.pcpitstop.com/Nirvana/*.js` and respond with JavaScript of their choice, the traditional `calc.exe` payload here being `(new ActiveXObject('WScript.Shell')).Exec('calc.exe');`.
+
+Additionally, the PC Matic installer installs a service that runs as SYSTEM, which essentially runs `wscript scan.wsf` every hour, as SYSTEM. `scan.wsf` basically GETS the contents of `http://www.pcpitstop.com/Nirvana/scheduledscanpack.js` and then `eval()`s it. So an entity in a MITM position can just wait up to an hour for the service to run their own JavaScript, as SYSTEM.
+
+PC Matic also installs and uses several ActiveX controls, that are signed by a code signing certificate issued by Thawte. One of these ActiveX controls, `PCPitstop2.dll`, exposes some interesting methods to IE. Some are limited to specific domains (however, any cross-site-scripting issue in the allowed domains would bypass this limitation). Some, however, are not; and so `<object name="Exam" id="Exam" classid="CLSID:FFB3A759-98B1-446F-BDA9-909C6EB18CC7"></object><script>(function(){var e=document.getElementById('Exam');e.DeviceDriverInstallArguments="-EncodedCommand ...";e.InstallDriver("powershell.exe","","");})();</script>` would happily execute `powershell.exe -EncodedCommand ...` with user permissions, assuming the user clicked Allow on the Protected Mode security warning. And, let's face it: [PC Matic shows advertisements on Fox News](https://twitter.com/WithinRafael/status/700617732593614848); these would *probably* be the kind of users who'd just allow all the things. Not to mention they'd be the kind of users who still use IE, too.
+
+# Affected Versions
+
+1.1.0.65 and below.
+
+# Solution
+
+Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.
