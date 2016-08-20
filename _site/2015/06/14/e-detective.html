@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Multiple Critical Vulnerabilities in E-Detective Lawful Interception System</title>
+  <meta name="description" content="By Mustafa Al-Bassam and slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/06/14/e-detective.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Multiple Critical Vulnerabilities in E-Detective Lawful Interception System</h1>
+     <p class="post-meta">Posted on Jun 14, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By Mustafa Al-Bassam and slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>From the <a href="http://www.edecision4u.com/E-DETECTIVE.html">vendor&#39;s website</a>:</p>
+
+<blockquote>
+<p>E-Detective is a real-time Internet interception, monitoring and forensics system that captures, decodes, and reconstructs various types of Internet traffic. It is commonly used for organization Internet behavioral monitoring, auditing, record keeping, forensics analysis, and investigation, as well as, legal and lawful interception for lawful enforcement agencies such as Police Intelligence, Military Intelligence, Cyber Security Departments, National Security Agencies, Criminal Investigation Agencies, Counter Terrorism Agencies etc. It also can provide a compliance solution for many standards or acts like Sarbanes Oxley Act (SOX), HIPAA, GLBA, SEC, NASD, E-Discovery and many others.</p>
+</blockquote>
+
+<p>Decision Group also <a href="http://www.edecision4u.com/HTTPS-SSL.html">claims</a> that its products are used by &quot;more than 100 law enforcement agencies&quot;, including the National Security Bureau of the Republic of China.</p>
+
+<p>E-Detective suffers from multiple critical security vulnerabilities, detailed in this advisory.</p>
+
+<h1>Issues</h1>
+
+<p>E-Detective has a web management interface for viewing intercepted communications and managing the system, which can be exploited in multiple ways.</p>
+
+<h2>1. Unauthenticated Local File Disclosure</h2>
+
+<p>The <code>common/download.php</code> script in the web root allows for unauthenticated users to read arbitrary files on the system. This may include database credentials and captured data intercepts.</p>
+
+<p>The <code>file</code> URL query parameter of the script is &quot;protected&quot; by the following encoding which is trivially reversible: base64 followed by rot40.</p>
+
+<p>A <a href="https://github.com/lizardhq/exploits/blob/master/e-detective/pwned-detective.py">proof of concept for this vulnerability is available here</a>.</p>
+
+<h2>2. Authenticated Remote Code Execution</h2>
+
+<p>Combining this vulnerability with the Local File Disclosure vulnerability above can result in unauthenticated remote code execution.</p>
+
+<p>The restore feature on the &quot;config backup&quot; page extracts a .tar file encrypted with Blowfish using OpenSSL into the system&#39;s root directory (<code>/</code>) as root.</p>
+
+<p>The .tar file must be encrypted with the static key <code>/tmp/.charlie</code>. Yes, that&#39;s the actual key - the software passes the wrong argument to OpenSSL. <code>-K</code> is used to pass the keyfile instead of <code>-kfile</code>, meaning that the key is the path of the keyfile rather than the contents of the keyfile.</p>
+
+<p>This allows an attacker to upload a shell into the web root, or overwrite any sensitive system files such as <code>/etc/shadow</code>.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of E-Detective will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

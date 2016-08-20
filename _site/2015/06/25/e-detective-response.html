@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Response to Decision Group press release about security vulnerabilities in E-Detective Lawful Interception System</title>
+  <meta name="description" content="By Mustafa Al-Bassam.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/06/25/e-detective-response.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Response to Decision Group press release about security vulnerabilities in E-Detective Lawful Interception System</h1>
+     <p class="post-meta">Posted on Jun 25, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By Mustafa Al-Bassam.</em></p>
+
+<p>Two weeks ago we posted a <a href="../../../2015/06/14/e-detective.html">security advisory</a> detailing severe security flaws in E-Detective, a &quot;lawful&quot; communications interception system. The vendor is a company called Decision Group and they <a href="http://www.edecision4u.com/HTTPS-SSL.html">claim on their website</a> that their software is used by over 100 law enforcement agencies.</p>
+
+<p>A few days ago they posted a <a href="http://www.edecision4u.com/2015news/20150618_New%20Release.html">press release</a> to respond to an <a href="http://www.ibtimes.co.uk/e-detective-spying-tool-used-by-over-100-law-enforcement-agencies-has-major-security-holes-1506447">IBTimes article</a> that covered the security flaws.</p>
+
+<p>The mere fact that they responded to a news article about the security flaws instead of the original security advisory is telling of their attitude to security. An attitude that is unfortunately too common: that security is seen as an externality that affects its customers more than the company itself, so resources should only be devoted to it if it&#39;s a public relations issue.</p>
+
+<p>Nevertheless, their response is very much a non-response. It fails to express responsibility for the security holes, and instead deflects the responsibility on their customers.</p>
+
+<p>Excusing their broken English, here&#39;s a point-by-point response to their press release.</p>
+
+<blockquote>
+<p>Actually we are fully aware of such security concern since 4 years ago when our client asked to enhance the security level of E-Detective system.&quot;</p>
+</blockquote>
+
+<p>The fact that they&#39;ve been fully aware of these security flaws for 4 years and failed to do something about them until recently is not exactly redeeming. That only makes it much, much worse.</p>
+
+<p>By their own admission they admit that third parties (their clients) have known about these vulnerabilities. Their clients (one of whom they claim to be the National Security Bureau of the Republic of China, which is effectively the Taiwanese NSA) buy their software for the purpose of degrading security. One can only shudder to imagine how many times these flaws have been attempted to be exploited for the purpose of collecting intercepts from other customers.</p>
+
+<blockquote>
+<p>The most important guideline of E-Detective deployment is that E-Detective should be deployed in the closed network domain without Internet access to outside world. This network domain should be also isolated from other corporate or government service network segment. By this way, only few authentic staff can access the internal system.</p>
+</blockquote>
+
+<p>A great example of how a false sense of security can be dangerous. Isolating services in their own network doesn&#39;t fix the security flaws nor make them impossible to exploit - it just makes it harder.</p>
+
+<p>There are countless ways that a private network can be compromised. No matter how tight your network is. To get any reasonable work done staff members will move data in and out of the network, even if your network is disconnected from the Internet. There are many entry points into a network, something which shouldn&#39;t really need to be explained to a company that sells surveillance software for a living if they are competent.</p>
+
+<p>Software compartmentalisation and network isolation is a good security practice, but it&#39;s not a substitute for fixing vulnerabilities or an excuse to run dangerously insecure software.</p>
+
+<p>Even if one was to make the (false) assumption that running E-Detective on an isolated network prevents vulnerabilities affected by it from being exploited: how many of those &quot;100+&quot; customers actually follow these guidelines or have a sane network setup that allows them to do this kind of isolation?</p>
+
+<p>Furthermore, the actual function of E-Detective means that it can never be on a fully isolated network. There will always be an entry point. E-Detective intercepts communications by using a man-in-the-middle proxy. That proxy will need to be connected to the network that the customer wants to intercept communications from. Based on the case studies that they list on their website, that network will also probably be connected to the Internet.</p>
+
+<p>Unless a human being is manually transferring data using external storage from the proxy to the E-Detective system, then the system will probably also be in some way connected to the proxy.</p>
+
+<blockquote>
+<p>Since all users of E-Detective are of 4 types: operator, administrator, auditor and datamvr. Operator has the authorized right to input queries and view the scope of intercepted data by his/her own right. Administrator can have authorized right to conduct the operation of system backup, user management, and software system tuning…etc. Auditor has the only right to check and view all log files in the system. The last type of user is only for data transport between different systems, and it cannot be used for system access. None of these users has the superuser right of root. In most cases, root is basically set to hibernation status after system is activated by license under customer SLA request in order to terminate security backdoor.</p>
+</blockquote>
+
+<p>All of this is made useless by a vulnerability that was discovered after the publication of the original security advisory. It turns out that features that the root user has access to are hidden from the menu of other users, but other users can still access those features by manually navigating to each feature&#39;s page.</p>
+
+<p>Even if the root user is deactivated after installation in &quot;most cases&quot;, this still doesn&#39;t address the fact that the system backup feature uses a static key, which can be exploited to perform remote code execution.</p>
+
+<blockquote>
+<p>Besides, E-Detective can be integrated with OTP server for more secured access control, and all logon access record will be reviewed in OTP server for auditing. Biometric access mechanism module with fingerprint can be also available by customer request, but it depends on whether the fingerprint reader is supported on user workstation.</p>
+</blockquote>
+
+<p>The system is so dangerously insecure beyond easy repair at this point that we feel sorry for anyone that has to trust it with their biometric data.</p>
+
+<blockquote>
+<p>After all, E-Detective system is used by our customer for network forensic purpose, such as internal data leakage protection, cyber evidence collection and lawful interception. System security is always the top priority for our customer. All the vulnerabilities mentioned in the news by International Business Times have been fixed several months ago. “Customer IT security is always our top concern,” said Casper Kan Chang, CEO of Decision Group, “and we have already fixed all the vulnerabilities in this current version of E-Detective for more than 11 months.” For those existing customers with old version of system still has concern, Decision Group will update it for free without hesitation.&quot;</p>
+</blockquote>
+
+<p>If IT security is &quot;always&quot; their top concern, why did it take them 3 years to (claim to) fix these vulnerabilities? Have they proactively contacted the customers that are running insecure versions of their software, or are they waiting for their customers to contact them?</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

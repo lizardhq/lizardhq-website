@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Dell System Detect User Access Control (UAC) Bypass</title>
+  <meta name="description" content="By slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/12/05/dell-system-detect.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Dell System Detect User Access Control (UAC) Bypass</h1>
+     <p class="post-meta">Posted on Dec 5, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>Dell System Detect (DSD) is &quot;an application that runs on your Windows-based PC or tablet with your permission and interacts with the Dell Support website so that we can provide a better and more personalized support experience.&quot;</p>
+
+<p>An issue in Dell System Detect, versions 6.12.0.1 and below, can be exploited to bypass UAC.</p>
+
+<h1>Issues</h1>
+
+<p>Dell System Detect starts an HTTPd on localhost that listen on one of four ports: 8884, 8883, 8886 or 8885.</p>
+
+<p>The APIs exposed by this HTTPd are protected by two methods:</p>
+
+<ol>
+<li><p>Referer and origin header checks, referer or origin domain must be one of several Dell-owned domains.</p></li>
+<li><p>Specific API methods can only be called with the correct signature, generated via an RSA-1024 key.</p></li>
+</ol>
+
+<p>The first method can easily be bypassed by code running on the system (or a man-in-the-middle for that matter).</p>
+
+<p>The second can also be easily bypassed, as specific pages on Dell&#39;s site can be scraped to gain valid signatures for some interesting APIs.</p>
+
+<p>The Dell System Detect executable has a valid code signature; and on startup, if not started with specific arguments it tries to elevate itself.</p>
+
+<p>Assuming the user denies the elevation. the <code>checkadminrights</code> API also tries to elevate. The API supposedly returns false if DSD is not elevated, but in practise, it returned true all the time.</p>
+
+<p>This bug can be worked around by using the time that the request took to execute. With experimentation, it seems that if the API request had taken over 200ms, then a UAC request dialog had been spawned.</p>
+
+<p>After the user has confirmed elevation, a wait must occur for DSD to restart its HTTPd. It seems a delay of 200ms every loop is adequate for this.</p>
+
+<p>When DSD has been elevated, a second API, <code>installmanual</code>, can be used to run any file. The <code>\\</code> character is filtered out, but the <code>/</code> character can be used as a replacement.</p>
+
+<p>A PoC is available as <code>dellsystempwned.d</code> in <a href="http://rol.im/oemdrop/">this trio of OEM exploit PoCs.</a></p>
+
+<h1>Affected Versions</h1>
+
+<p>6.12.0.1 and below.</p>
+
+<h1>Solution</h1>
+
+<p>Not even uninstallation of Dell System Detect will prevent exploitation of these issues; it runs from <code>%APPDATA%</code> so malware could easily drop it on your system to exploit this issue.</p>
+
+<p>The checkadminrights method is hardcoded to execute <code>DellSystemDetect.exe</code> so, uninstallation of Dell System Detect and blacklisting of <code>DellSystemDetect.exe</code> from being executed will prevent exploitation of these issues.</p>
+
+<p>The researchers cannot sanction any mitigations except to perform these actions.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

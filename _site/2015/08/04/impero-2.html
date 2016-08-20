@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro (II)</title>
+  <meta name="description" content="Overview">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/08/04/impero-2.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro (II)</h1>
+     <p class="post-meta">Posted on Aug 4, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <h1>Overview</h1>
+
+<p><a href="https://www.imperosoftware.co.uk/">Impero Education Pro</a> is &quot;a single, feature rich solution combining network management, desktop management and classroom management software for education&quot;.</p>
+
+<p>Issues in Impero Education Pro, version 5.0.03 to 5.1.04, can be exploited to cause remote command execution on every client.</p>
+
+<h1>Disclosure note</h1>
+
+<p>The vendor was not amused at our <a href="../../../2015/07/14/impero.html">last security advisory</a> because full disclosure was opted for instead of co-ordinated disclosure. They responded with a <a href="../../../files/Letter%20to%20Mr%20Zammis%20A%20Clark%20dated%2013%20July%202015.pdf">cease-and-desist letter</a> from their lawyers.</p>
+
+<p>This time, we decided to inform them of the new vulnerabilities outlined in this advisory before public release.</p>
+
+<p>So we arranged for 9001 copies of the advisory and proof-of-concept to be <a href="http://iops.io/blog/impero-software-over-9000">delivered to their office in person</a>. They were not amused either. There is just no winning, is there? See below for a video of the delivery.</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/OCh867rT1dg?start=90" frameborder="0" allowfullscreen></iframe>
+
+<h1>Issues</h1>
+
+<p>The week after the <a href="../../../2015/07/14/impero.html">vulnerabilities in version 5.0.03 and below</a> were disclosed, the vendor released a hotfix to work around the issue. The hotfix adds additional authentication that is needed to access the <code>ECHO</code> command; a static security-by-obscurity challenge-response system that is only a little less trivial to implement.</p>
+
+<p>A client with this new authentication algorithm implemented can connect to a server that implements it and continue to exploit the previously discovered vulnerabilities.</p>
+
+<h2>Privilege Escalation (leading to Remote Code Execution)</h2>
+
+<p>Due to a static security-by-obscurity weak authentication algorithm, all clients are able to send client commands to other clients via the <code>ECHO</code> command, which can only be accessed after performing the authentication algorithm. This can be used to execute system commands.</p>
+
+<p>The authentication algorithm does not require the client to know any secrets or passphrases - only knowledge of the algorithm itself is needed to authenticate.</p>
+
+<p>A <a href="https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc-2.php">remote code execution proof-of-concept that exploits these issues and pops <code>calc.exe</code> on all connected clients is available</a>.</p>
+
+<h3>Authentication algorithm</h3>
+
+<p>The static authentication algorithm is as follows.</p>
+
+<ol>
+<li>Create a SHA512 hash of some random data, encode it as hexits, and send to the server <code>AUTHENTICATE_L1</code>, with the argument being the hash.</li>
+<li>The server should send back a <code>CHALLENGE_L1</code> command, with one argument which is a hexit-encoded SHA512 hash of random data that it created. (Side note: in the server implementation, a non-cryptographically secure PRNG is used.)</li>
+<li>Concatenate together the hash that the server sent back, the string <code>{edbe23f3-eeda-49ef-9155-9bab8f584c55},{b40121e9-bb21-47c2-9ff7-4cbb09ec06a8}753f</code>, and the hash that we sent to the server, and make a SHA512 hash of this string. We call this hash <code>hash one</code>.</li>
+<li>Apply 1000 rounds of SHA512 on <code>hash one</code>, to create <code>hash two</code>. Store the hash in both raw binary data and as hexits.</li>
+<li>Brute force a SHA512 hash based on the raw binary data of <code>hash two</code>. This should be done by finding an integer <code>i</code> (iterating from 0), encoding it in hexadecimal form, concatenating it to the raw binary data of <code>hash two</code>, hashing it (<code>SHA512(hashtwo.hex(i))</code>) and comparing the first two bytes of the resulting hash and <code>hash one</code>. If they are equal, the resulting hash becomes <code>hash three</code>, which should be stored as raw binary data. <em>Yes, bruteforcing is actually a part of the authentication algorithm - presumably as some kind of proof-of-work.</em></li>
+<li>Brute force another SHA512 hash based on the raw binary data of <code>hash two</code>. This is done the same as previously in step 5, except <code>hash two</code> should be contatenated to the hexadecimal encoded integer (<code>SHA512(hex(i).hashtwo)</code>), and the last two bytes should be compared; if they are equal, the generated hash becomes <code>hash four</code>, which should be stored as raw binary data.
+Concatenate <code>hash three</code> and <code>hash four</code> together, and create a SHA512 hash of the resulting byte array, to create <code>hash five</code>, which should be stored as hexits.</li>
+<li>Take the first 0x10 bytes from the <code>hash five</code> hexit string, and from now on use it as the protocol communication AES key. Similarly, take the last 0x10 bytes from the hexit string, and use it as the new initialisation vector.</li>
+<li>Using the new key/IV, send to the server <code>RESPONSE_L1</code>, with the argument being the hexit encoded <code>hash two</code>.</li>
+<li>The server should send a <code>SERVER_AUTH_L1</code> command with the argument <code>OK</code>.</li>
+<li>Send the server a <code>CLIENT_AUTH_L1</code> command with no argument.
+The server does not respond to this command; after the command is sent, the client is fully authenticated.</li>
+</ol>
+
+<h1>Affected Versions</h1>
+
+<p>5.0.08+ and 5.1.02+.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

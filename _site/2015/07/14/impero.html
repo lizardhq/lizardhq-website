@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro</title>
+  <meta name="description" content="Overview">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/07/14/impero.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Multiple Critical Vulnerabilities in Impero Education Pro</h1>
+     <p class="post-meta">Posted on Jul 14, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <h1>Overview</h1>
+
+<p><a href="https://www.imperosoftware.co.uk/">Impero Education Pro</a> is &quot;a single, feature rich solution combining network management, desktop management and classroom management software for education&quot;.</p>
+
+<p>Issues in Impero Education Pro, version 5.0.03 and below, can be exploited to cause remote command execution on every client.</p>
+
+<h1>Issues</h1>
+
+<p>The software consists of a client that communicates with a server, to enable the server to manage and monitor the client machine. There exists issues in the communication and authentication method between the client and server, which can be easily leveraged to allow for remote code execution on every client machine managed by the server. This is due to a fatal design flaw in the software: the server grants all clients the privilege to execute system commands on any other client&#39;s machine.</p>
+
+<p>A <a href="https://github.com/lizardhq/exploits/blob/master/impero/impero-rce-poc.php">remote code execution proof-of-concept that exploits these issues and pops <code>calc.exe</code> on all connected clients is available</a>.</p>
+
+<h2>Privilege Escalation (leading to Remote Code Execution)</h2>
+
+<p>All clients are able to send client commands to other clients via the <code>ECHO</code> command, which can be used to execute system commands.</p>
+
+<h3>Server-side commands</h3>
+
+<ul>
+<li>The <code>SENDALLCLIENTS</code> command causes the server to send the client a list of all connected clients. This list may be gzip compressed and base64 encoded.</li>
+<li>The <code>ECHO</code> command sends the command given as the argument across to all specified clients, enabling access to commands only implemented on the client side.</li>
+</ul>
+
+<h3>Client-side commands</h3>
+
+<ul>
+<li><p>The <code>OPENFILE</code> command takes as arguments a file to run, and the username and password to run it as. For Windows clients, the username can be <code>NT AUTHORITY\SYSTEM</code>, and if that is the case, the password given can be anything.</p></li>
+<li><p>The <code>SENDCOMMANDMSG</code> command takes one argument: a system command that gets passed to <code>system()</code> and ran as the user that the Impero service is running as; this, of course, will be SYSTEM on Windows.</p></li>
+</ul>
+
+<p>Note that some protocol commands get logged server-side. This includes <code>SENDCOMMANDMSG</code> but not <code>OPENFILE</code>.</p>
+
+<h2>Hard-coded Encryption Key</h2>
+
+<p>The protocol is encrypted on the wire with AES-128-CBC, and ISO10126 padding. The key and IV are static and derived from a SHA512 hash of the string <code>Imp3ro</code>.</p>
+
+<h2>Hard-coded Authentication Password</h2>
+
+<p>When connected, a client must authenticate. This is done by sending the string <code>-1|AUTHENTICATE\x02PASSWORD</code>, encrypted as outlined in the above section (<em>Hard-coded Encryption Key</em>). <code>PASSWORD</code> is a string that is hard-coded - that is the actual password.</p>
+
+<p>After authentication, an attacker has full reign to send whatever supported protocol commands they wish.</p>
+
+<h1>Affected Versions</h1>
+
+<p>5.0.03 and below.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

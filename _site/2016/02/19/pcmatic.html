@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: Multiple Critical Vulnerabilities in PCPitstop PC Matic</title>
+  <meta name="description" content="By slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2016/02/19/pcmatic.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: Multiple Critical Vulnerabilities in PCPitstop PC Matic</h1>
+     <p class="post-meta">Posted on Feb 19, 2016</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>PC Matic &quot;provides superior security protection over all security products, free or otherwise, on the market&quot;.</p>
+
+<p>An issue in PC Matic, versions 1.1.0.65 and below, can be exploited by an entity in a man-in-the-middle position to cause remote code execution, as SYSTEM or as a standard user.</p>
+
+<p>Issues in PC Matic, versions 1.1.0.65 and below, can be exploited by a web page to potentially cause remote code execution as a standard user.</p>
+
+<h1>Issues</h1>
+
+<p>The PC Matic application is basically Internet Explorer. A version of IE that allows for certain objects like <code>WScript.Shell</code> to be instantiated. The application loads a home page via HTTP, which then loads some javascript files, which among other things do call out to <code>WScript.Shell</code>. An entity in a MITM position can easily intercept requests to <code>http://*.pcpitstop.com/Nirvana/*.js</code> and respond with JavaScript of their choice, the traditional <code>calc.exe</code> payload here being:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">(</span><span class="k">new</span> <span class="nx">ActiveXObject</span><span class="p">(</span><span class="s1">&#39;WScript.Shell&#39;</span><span class="p">)).</span><span class="nx">Run</span><span class="p">(</span><span class="s1">&#39;calc.exe&#39;</span><span class="p">);</span>
+</code></pre></div>
+<p>Additionally, the PC Matic installer installs a service that runs as SYSTEM, which essentially runs <code>wscript scan.wsf</code> every hour, as SYSTEM. <code>scan.wsf</code> basically GETS the contents of <code>http://www.pcpitstop.com/Nirvana/scheduledscanpack.js</code> and then <code>eval()</code>s it. So an entity in a MITM position can just wait up to an hour for the service to run their own JavaScript, as SYSTEM.</p>
+
+<p>PC Matic also installs and uses several ActiveX controls, that are signed by a code signing certificate issued by Thawte. One of these ActiveX controls, <code>PCPitstop2.dll</code>, exposes some interesting methods to IE. Some are limited to specific domains (however, any cross-site-scripting issue in the allowed domains would bypass this limitation). Some, however, are not; and so...</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;object</span> <span class="na">name=</span><span class="s">&quot;Exam&quot;</span> <span class="na">id=</span><span class="s">&quot;Exam&quot;</span> <span class="na">classid=</span><span class="s">&quot;CLSID:FFB3A759-98B1-446F-BDA9-909C6EB18CC7&quot;</span><span class="nt">&gt;&lt;/object&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+    <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+        <span class="kd">var</span> <span class="nx">e</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;Exam&#39;</span><span class="p">);</span>
+        <span class="nx">e</span><span class="p">.</span><span class="nx">DeviceDriverInstallArguments</span> <span class="o">=</span> <span class="s2">&quot;-EncodedCommand ...&quot;</span><span class="p">;</span>
+        <span class="nx">e</span><span class="p">.</span><span class="nx">InstallDriver</span><span class="p">(</span><span class="s2">&quot;powershell.exe&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+    <span class="p">})();</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+<p>... would happily execute <code>powershell.exe -EncodedCommand ...</code> with user permissions, assuming the user clicked Allow on the Protected Mode security warning. And, let&#39;s face it: <a href="https://twitter.com/WithinRafael/status/700617732593614848">PC Matic shows advertisements on Fox News</a>; these would <em>probably</em> be the kind of users who&#39;d just allow all the things. Not to mention they&#39;d be the kind of users who still use IE, too.</p>
+
+<h1>Affected Versions</h1>
+
+<p>1.1.0.65 and below.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>
