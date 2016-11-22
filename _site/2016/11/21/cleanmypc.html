@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Security Advisory: File Read/Write as SYSTEM Vulnerability in MacPaw CleanMyPC</title>
+  <meta name="description" content="By slipstream/RoL.">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/2016/11/21/cleanmypc.html">
+  <link rel="alternate" type="application/rss+xml" title="LizardHQ research" href="/feed.xml" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700' rel='stylesheet' type='text/css'>
+</head>
+
+
+  <body>
+
+    <div class="site-header">
+
+  <div class="logo">
+    <a href="/"><img src="/img/logo.png"></a>
+  </div>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <i class="fa fa-navicon fa-lg"></i>
+      </a>
+
+      <div class="trigger">
+          <a class="page-link" href="/">Home</a>
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+
+</div>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+     <h1 class="post-title">Security Advisory: File Read/Write as SYSTEM Vulnerability in MacPaw CleanMyPC</h1>
+     <p class="post-meta">Posted on Nov 21, 2016</p>
+  </header>
+
+  <article class="post-content">
+    <p><em>By slipstream/RoL.</em></p>
+
+<h1>Overview</h1>
+
+<p>CleanMyPC &quot;is more than a PC cleaner — it’s an essential tool that cares for your computer&quot;.</p>
+
+<p>An issue in CleanMyPC, versions 1.8.1.570 and below, can be exploited by a local attacker to read from and write to any file on the system with SYSTEM privileges. This can lead to local privilege escalation.</p>
+
+<h1>Issues</h1>
+
+<p>CleanMyPC bundles a service, named <code>CleanMyPCService</code> which exposes various WCF services as named pipes.</p>
+
+<p>One of the services exposed is <code>CmpDataFilesService</code> which exposes two methods: <code>byte[] GetCleanMyPCDataFileContent(string fileName)</code> which returns the content of <code>fileName</code>, read as SYSTEM, and <code>void SaveCleanMyPCDataFileContent(string fileName, byte[] content)</code> which writes <code>content</code> to <code>fileName</code>, again as SYSTEM.</p>
+
+<p>Both methods try to work with a specific relative path; <code>GetCleanMyPCDataFileContent</code> if the file exists in that relative path (but this is always false if you pass an absolute path); and <code>SaveCleanMyPCDataFileContent</code> if the write failed with the path that was passed to it.</p>
+
+<p>A PoC is <a href="https://lizardhq.org/files/climbmypc.zip">available</a>: <code>climbmypc.cs</code> attempts to use this issue to copy between two passed file locations as SYSTEM.</p>
+
+<h1>Affected Versions</h1>
+
+<p>Version 1.8.1.570 and below.</p>
+
+<h1>Solution</h1>
+
+<p>Uninstallation of this software will prevent exploitation of the issue. The researchers cannot sanction any mitigations except to remove this software definitively from any affected devices.</p>
+
+<h1>Greetings</h1>
+
+<p>Thanks to Techdirt for <a href="https://www.techdirt.com/articles/20161118/09225436083/daily-deal-cleanmypc-single-license-sorry-about-that.shtml">their accidental promotion of CleanMyPC</a>. Without it, I probably wouldn&#39;t have found the software to audit it.</p>
+
+  </article>
+
+  <div align="center">
+  	<a href="#">
+  	<i class="fa fa-arrow-circle-up fa-2x"></i>
+  	</a>
+  </div>
+
+</div>
+
+        <div class="footer" align="right">
+  <hr>
+  <a href="http://kopimi.com" target="_blank"><img src="/img/kopimi.gif"></a>
+  <a href="https://twitter.com/lizardhq" target="_blank">@lizardhq</a>
+</div>
+
+      </div>
+    </div>
+
+  </body>
+</html>

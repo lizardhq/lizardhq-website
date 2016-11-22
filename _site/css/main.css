@@ -72,7 +72,7 @@ h6 {
 /* Links
  * ============================================== */
 a {
-  color: #009fd4;
+  color: #009fd5;
   text-decoration: none; }
   a:hover {
     color: #00B2EE;
@@ -95,7 +95,7 @@ blockquote {
 pre,
 code {
   font-size: 13px;
-  border: 1px solid #cecece;
+  border: 1px solid #cfcfcf;
   font-family: Menlo, Monaco, "Andale Mono", monospace; }
 
 code {
@@ -190,7 +190,7 @@ table {
       top: 3px;
       right: 3px;
       background-color: #FFF;
-      border: 1px solid #cecece;
+      border: 1px solid #cfcfcf;
       border-radius: 5px;
       text-align: right; }
       .site-nav .menu-icon {
@@ -266,7 +266,7 @@ table {
 
 .post-meta {
   font-size: 14.32px;
-  color: #cecece;
+  color: #cfcfcf;
   text-transform: uppercase;
   display: inline-block; }
 

