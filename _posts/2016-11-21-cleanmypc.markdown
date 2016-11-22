@@ -21,7 +21,7 @@ One of the services exposed is `CmpDataFilesService` which exposes two methods: 
 
 Both methods try to work with a specific relative path; `GetCleanMyPCDataFileContent` if the file exists in that relative path (but this is always false if you pass an absolute path); and `SaveCleanMyPCDataFileContent` if the write failed with the path that was passed to it.
 
-A PoC is [available](https://lizardhq.org/files/climbmypc.zip): `climbmypc.cs` attempts to use this issue to copy between two passed file locations as SYSTEM.
+A PoC is [available](/files/climbmypc.zip): `climbmypc.cs` attempts to use this issue to copy between two passed file locations as SYSTEM.
 
 # Affected Versions
 
